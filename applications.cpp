@@ -86,7 +86,8 @@ void Applications::filter(QString search)
     foreach(DesktopFile* file, m_internalData)
     {
         if(file->name().contains(search,Qt::CaseInsensitive)
-                || file->comment().contains(search, Qt::CaseInsensitive))
+                || file->comment().contains(search, Qt::CaseInsensitive)
+                || file->exec().contains(search, Qt::CaseInsensitive))
         {
             this->add(file);
         }
