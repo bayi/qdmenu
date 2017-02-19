@@ -30,6 +30,7 @@ class Applications : public QAbstractListModel
     QList<DesktopFile*> m_data;
     QList<DesktopFile*> m_internalData;
     int m_count;
+    bool parserRunning = false;
 
     void parseApplications();
     QStringList readFolder(QString folder);

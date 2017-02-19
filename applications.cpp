@@ -1,6 +1,6 @@
 #include "applications.h"
 #include <QDir>
-#include <qdebug.h>
+#include <QtConcurrent/QtConcurrent>
 
 const int Applications::NameRole = Qt::UserRole + 1;
 const int Applications::IconRole = Qt::UserRole + 2;
@@ -10,8 +10,8 @@ const int Applications::TerminalRole = Qt::UserRole + 4;
 Applications::Applications(QObject *parent) :
     QAbstractListModel(parent)
 {
-    this->parseApplications();
-    this->m_files.clear();
+    parserRunning = true;
+    QFuture<void> future = QtConcurrent::run(this, &Applications::parseApplications);
 }
 
 Applications::~Applications()
@@ -35,9 +35,11 @@ void Applications::parseApplications()
             this->add(app);
         }
     }
+    this->m_files.clear();
     this->sort();
 
     emit ready();
+    parserRunning = false;
 }
 
 QStringList Applications::readFolder(QString folder)
@@ -81,6 +83,7 @@ DesktopFile* Applications::get(int index) const
 
 void Applications::filter(QString search)
 {
+    if (parserRunning) return;
     beginRemoveRows(QModelIndex(), 0, m_data.size());
     m_data.clear();
     endRemoveRows();
