@@ -1,6 +1,5 @@
 #include "applications.h"
 #include <QDir>
-#include <QtConcurrent/QtConcurrent>
 
 const int Applications::NameRole = Qt::UserRole + 1;
 const int Applications::IconRole = Qt::UserRole + 2;
@@ -10,15 +9,17 @@ const int Applications::TerminalRole = Qt::UserRole + 4;
 Applications::Applications(QObject *parent) :
     QAbstractListModel(parent)
 {
-    parserRunning = true;
-    QFuture<void> future = QtConcurrent::run(this, &Applications::parseApplications);
+    connect(&m_parserThreadWatcher, SIGNAL(finished()), this, SLOT(parseFinished()));
+    m_parserRunning = true;
+    m_parserThread = QtConcurrent::run(this, &Applications::parseApplications);
+    m_parserThreadWatcher.setFuture(m_parserThread);
 }
 
 Applications::~Applications()
 {
+    if (m_parserThread.isRunning())
+        m_parserThread.cancel();
     qDeleteAll(this->m_internalData);
-    this->m_internalData.clear();
-    this->m_data.clear();
 }
 
 void Applications::parseApplications()
@@ -32,14 +33,9 @@ void Applications::parseApplications()
         if (!app->noDisplay())
         {
             m_internalData.append(app);
-            this->add(app);
         }
     }
     this->m_files.clear();
-    this->sort();
-
-    emit ready();
-    parserRunning = false;
 }
 
 QStringList Applications::readFolder(QString folder)
@@ -83,7 +79,7 @@ DesktopFile* Applications::get(int index) const
 
 void Applications::filter(QString search)
 {
-    if (parserRunning) return;
+    if (m_parserRunning) return;
     beginRemoveRows(QModelIndex(), 0, m_data.size());
     m_data.clear();
     endRemoveRows();
@@ -140,4 +136,11 @@ QHash<int, QByteArray> Applications::roleNames() const
     roles.insert(ExecRole, QByteArray("exec"));
     roles.insert(TerminalRole, QByteArray("terminal"));
     return roles;
+}
+
+void Applications::parseFinished()
+{
+    m_parserRunning = false;
+    this->filter("");
+    emit ready();
 }

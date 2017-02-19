@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QList>
 #include <QStringList>
+#include <QtConcurrent/QtConcurrent>
 #include "desktopfile.h"
 
 #define APPLICATIONS_PATH       "/usr/share/applications"
@@ -30,7 +31,9 @@ class Applications : public QAbstractListModel
     QList<DesktopFile*> m_data;
     QList<DesktopFile*> m_internalData;
     int m_count;
-    bool parserRunning = false;
+    bool m_parserRunning = false;
+    QFuture<void> m_parserThread;
+    QFutureWatcher<void> m_parserThreadWatcher;
 
     void parseApplications();
     QStringList readFolder(QString folder);
@@ -53,7 +56,8 @@ signals:
     void countChanged(int count);
     void ready();
 
-public slots:
+private slots:
+    void parseFinished();
 
 };
 
