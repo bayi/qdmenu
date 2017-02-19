@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>AppList.qml</file>
+        <file>CommandInput.qml</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>unknown.svg</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file>lineedit.png</file>
+    </qresource>
+</RCC>
