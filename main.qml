@@ -31,7 +31,13 @@ Window
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: parent.width / 4
             Layout.preferredHeight: 32
-            onItemSelected: process.start(applist.current().exec, applist.current().terminal)
+            onItemSelected:
+            {
+                if (applist.current() === null)
+                    process.start(text, true)
+                else
+                    process.start(applist.current().exec, applist.current().terminal)
+            }
             onMoveUp: applist.up()
             onMoveDown: applist.down()
             onMoveLeft: applist.left()

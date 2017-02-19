@@ -5,7 +5,7 @@ Item
 {
     signal itemSelected(variant app)
 
-    function current() { return list.currentItem.item}
+    function current() { return list.currentItem != null ? list.currentItem.item : null}
     function up() { list.moveCurrentIndexUp() }
     function down() { list.moveCurrentIndexDown() }
     function left() { list.moveCurrentIndexLeft() }
