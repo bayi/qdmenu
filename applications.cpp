@@ -14,6 +14,13 @@ Applications::Applications(QObject *parent) :
     this->m_files.clear();
 }
 
+Applications::~Applications()
+{
+    qDeleteAll(this->m_internalData);
+    this->m_internalData.clear();
+    this->m_data.clear();
+}
+
 void Applications::parseApplications()
 {
     this->m_files.append(this->readFolder(QDir::homePath() + APPLICATIONS_LOCAL_PATH));
@@ -21,7 +28,7 @@ void Applications::parseApplications()
 
     foreach(QString file, this->m_files)
     {
-        DesktopFile* app = new DesktopFile(file); // I know this leaks, but this object is never destructed
+        DesktopFile* app = new DesktopFile(file);
         if (!app->noDisplay())
         {
             m_internalData.append(app);

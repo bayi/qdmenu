@@ -38,6 +38,7 @@ class Applications : public QAbstractListModel
 
 public:
     explicit Applications(QObject *parent = 0);
+    virtual ~Applications();
 
     Q_INVOKABLE DesktopFile* get(int index) const;
     Q_INVOKABLE void filter(QString search);
