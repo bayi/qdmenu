@@ -40,14 +40,14 @@ class DesktopFile :public QObject
 
     QString m_fileName;
     QString m_version;
-    bool m_terminal;
+    bool m_terminal = false;
     QStringList m_categories;
     QString m_type;
     QString m_icon;
     QString m_exec;
     QString m_comment;
     QString m_name;
-    bool m_noDisplay;
+    bool m_noDisplay = false;
 
     bool parseFile();
 
