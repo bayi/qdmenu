@@ -1,6 +1,6 @@
 _pkgname=qdmenu
 pkgname=$_pkgname-git
-pkgver=v1.0
+pkgver=v1.0.1.g5edd670
 pkgrel=1
 pkgdesc="A QML dmenu replacement"
 arch=('i686' 'x86_64')

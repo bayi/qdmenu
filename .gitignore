@@ -45,3 +45,4 @@ qdmenu
 
 # Package folder
 pkg
+*.pkg.tar.xz
