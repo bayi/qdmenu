@@ -1,3 +1,4 @@
+# Maintainer: Balázs Batári <bayi@bayi.hu>
 _pkgname=qdmenu
 pkgname=$_pkgname-git
 pkgver=v1.0.8.gbd1c35a
