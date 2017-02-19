@@ -14,6 +14,7 @@ Window
     title: qsTr("qdmenu")
     visible: true
     visibility: Window.FullScreen
+    flags: Qt.FramelessWindowHint | Qt.WA_TranslucentBackground
 
     Process { id: process }
 
