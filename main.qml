@@ -11,7 +11,7 @@ Window
     width: Screen.width - 1 // Multimonitor fix
     height: Screen.height - 1 // Multimonitor fix
     color: "#000000"
-    title: qsTr("QDmenu")
+    title: qsTr("qdmenu")
     visible: true
     visibility: Window.FullScreen
 
