@@ -22,7 +22,11 @@ other tiling window manager. There is a PKGBUILD package submitted to AUR (https
     - Mouse also supported
 
 # Screenshots
+
+## Main Screen:
 ![Main screen](/screenshot1.jpg "Main screen")
+
+## Searcing:
 ![Searching](/screenshot2.jpg "Searching")
 
 # Contribution
