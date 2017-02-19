@@ -8,7 +8,7 @@
 /**
  * @todo: Config file in ~/.config/qmldmenu/
  * @todo: SHIFT(ENTER) for sudo
- * @todo: TAB For command (term /bin/*) / app (.desktop) mode
+ * @todo: TAB For command (term /{usr}/bin/) / app (.desktop) mode
  */
 int main(int argc, char *argv[])
 {
