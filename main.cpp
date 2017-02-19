@@ -9,6 +9,7 @@
  * @todo: Config file in ~/.config/qmldmenu/
  * @todo: SHIFT(ENTER) for sudo
  * @todo: TAB For command (term /{usr}/bin/) / app (.desktop) mode
+ * @todo: asynchronous parsing and model update from thread
  */
 int main(int argc, char *argv[])
 {

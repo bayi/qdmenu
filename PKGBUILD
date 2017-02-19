@@ -1,8 +1,8 @@
 _pkgname=qdmenu
 pkgname=$_pkgname-git
-pkgver=v1.0.7.g6f4012c
+pkgver=v1.0.8.gbd1c35a
 pkgrel=1
-pkgdesc="A QML dmenu replacement"
+pkgdesc="A QML launcher similar to dmenu"
 arch=('i686' 'x86_64')
 url=https://github.com/bayi/qdmenu
 license=('MIT')
