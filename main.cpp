@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QtQml>
 #include "applications.h"
 #include "iconprovider.h"
 #include "process.h"
