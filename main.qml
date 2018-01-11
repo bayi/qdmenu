@@ -1,6 +1,6 @@
-import QtQuick 2.7
+import QtQuick 2.5
 import QtQuick.Window 2.2
-import QtQuick.Layouts 1.3
+import QtQuick.Layouts 1.2
 import Qt.labs.folderlistmodel 1.0
 import QtLocation 5.3
 import Process 1.0
