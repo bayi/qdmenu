@@ -36,8 +36,10 @@ Item
         model: apps
         highlight: highlight
         highlightFollowsCurrentItem: true
-        clip:true
+        clip: false
         cacheBuffer: 12
+        cellHeight: 128
+        cellWidth: 96
 
         add: Transition { NumberAnimation { properties: "x,y" } }
         move: Transition { NumberAnimation { properties: "x,y" } }
@@ -48,7 +50,6 @@ Item
 
             id: listItem
             width: 80
-            height: 96
 
             Image
             {
@@ -75,8 +76,7 @@ Item
                 text: model.name
                 color: "#ffffff"
                 width: 80
-                height: 32
-                wrapMode: Text.Wrap
+                wrapMode: Text.WrapAnywhere
                 clip: true
                 horizontalAlignment: Text.AlignHCenter
             }
