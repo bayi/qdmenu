@@ -24,9 +24,9 @@ bool DesktopFile::parseFile()
     this->setComment(settings.value(DESKTOP_KEY_COMMENT).toString());
     QString name = settings.value(QString(DESKTOP_KEY_LOCALE_NAME).arg(locale)).toString();
     if (name.isEmpty())
-        this->setName(settings.value(DESKTOP_KEY_NAME).toString().left(DESKTOP_NAME_MAX_LENGTH));
+        this->setName(settings.value(DESKTOP_KEY_NAME).toString());
     else
-        this->setName(name.left(DESKTOP_NAME_MAX_LENGTH));
+        this->setName(name);
     this->setNoDisplay(settings.value(DESKTOP_KEY_NODISPLAY).toBool());
     return true;
 }

@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-#define DESKTOP_NAME_MAX_LENGTH         16
 #define DESKTOP_GROUP_ENTRY_NAME        "Desktop Entry"
 #define DESKTOP_KEY_NAME                "Name"
 #define DESKTOP_KEY_VERSION             "Version"
