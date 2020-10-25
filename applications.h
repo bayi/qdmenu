@@ -38,7 +38,7 @@ class Applications : public QAbstractListModel
     void parseApplications();
     QStringList readFolder(QString folder);
     void add(DesktopFile* item);
-    void sort();
+    void sortApps();
 
 public:
     explicit Applications(QObject *parent = 0);

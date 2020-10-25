@@ -65,7 +65,7 @@ void Applications::add(DesktopFile *item)
     emit countChanged(m_data.size());
 }
 
-void Applications::sort()
+void Applications::sortApps()
 {
     std::sort(this->m_data.begin(), this->m_data.end(),
               [](const DesktopFile* left, const DesktopFile* right) -> bool
@@ -94,7 +94,7 @@ void Applications::filter(QString search)
             this->add(file);
         }
     }
-    this->sort();
+    this->sortApps();
 }
 
 int Applications::rowCount(const QModelIndex &) const
