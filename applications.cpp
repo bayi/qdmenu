@@ -1,5 +1,6 @@
 #include "applications.h"
 #include <QDir>
+#include <qdebug.h>
 
 const int Applications::NameRole = Qt::UserRole + 1;
 const int Applications::IconRole = Qt::UserRole + 2;
@@ -32,6 +33,7 @@ void Applications::parseApplications()
         DesktopFile* app = new DesktopFile(file);
         if (!app->noDisplay() && !app->terminal())
         {
+            // qDebug() << "Adding application: " << app->name();
             m_internalData.append(app);
         }
     }
