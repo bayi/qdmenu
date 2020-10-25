@@ -30,7 +30,7 @@ void Applications::parseApplications()
     foreach(QString file, this->m_files)
     {
         DesktopFile* app = new DesktopFile(file);
-        if (!app->noDisplay())
+        if (!app->noDisplay() && !app->terminal())
         {
             m_internalData.append(app);
         }
