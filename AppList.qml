@@ -24,8 +24,8 @@ Item
             height: list.cellHeight
             color: "#2d75af"
             radius: 8
-            x: list.currentItem.x
-            y: list.currentItem.y
+            x: list.currentItem ? list.currentItem.x : 0
+            y: list.currentItem ? list.currentItem.y : 0
             Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
             Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
         }
@@ -50,8 +50,8 @@ Item
         cellHeight: Math.floor(parent.height / heightDivider)
         cellWidth: Math.floor(parent.width / widthDivider)
 
-        add: Transition { NumberAnimation { properties: "x,y" } }
-        move: Transition { NumberAnimation { properties: "x,y" } }
+        // add: Transition { NumberAnimation { properties: "x,y" } }
+        // move: Transition { NumberAnimation { properties: "x,y" } }
 
         delegate: Column
         {
@@ -61,6 +61,24 @@ Item
             width: list.cellWidth
             height: list.cellHeight
             padding: list.padding / 4
+
+            scale: 0
+            opacity: 0
+            GridView.onAdd: SequentialAnimation {
+
+                PauseAnimation {
+                    duration: Math.random() * 50
+                }
+
+                NumberAnimation {
+                    target: listItem
+                    property: "scale"
+                    properties: "scale, opacity"
+                    to: 1
+                    duration: 250
+                    easing.type: Easing.InOutQuad
+                }
+            }
 
             Image
             {
