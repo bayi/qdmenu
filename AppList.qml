@@ -75,7 +75,7 @@ Item
                     property: "scale"
                     properties: "scale, opacity"
                     to: 1
-                    duration: 250
+                    duration: 200
                     easing.type: Easing.InOutQuad
                 }
             }
