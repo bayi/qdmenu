@@ -23,6 +23,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<Applications>("Applications", 1, 0, "Applications");
     engine.addImageProvider(QLatin1String("appicon"), new IconProvider);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    if (engine.rootObjects().isEmpty())
+        return -1;
 
     return app.exec();
 }
