@@ -3,6 +3,10 @@
 A dmenu like launcher program written in QT/QML. It can be used as a drop-in replacement for dmenu for example in i3 and
 other tiling window manager. There is a PKGBUILD package submitted to AUR (https://aur.archlinux.org/packages/qdmenu/)
 
+# Requirements
+ - QT5 5.10+
+ - QT5 SVG
+
 # Features
 
  - Fast & simple
