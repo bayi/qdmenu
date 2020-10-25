@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick 2.10
 import QtQuick.Controls 2.0
 import Applications 1.0
 
@@ -20,27 +20,35 @@ Item
         id: highlight
         Rectangle
         {
-            width: list.cellWidth; height: list.cellHeight
-            color: "#2d75af"; radius: 5
+            width: list.cellWidth;
+            height: list.cellHeight
+            color: "#2d75af"
+            radius: 8
             x: list.currentItem.x
             y: list.currentItem.y
-            Behavior on x { SpringAnimation { spring: 4; damping: 0.25 } }
-            Behavior on y { SpringAnimation { spring: 4; damping: 0.25 } }
+            Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
+            Behavior on y { SpringAnimation { spring: 3; damping: 0.2 } }
         }
     }
 
     GridView
     {
         id: list
-        anchors.fill: parent
-        anchors.margins: 32
+
+        property int widthDivider: (parent.width < parent.height) ? 7 : 13
+        property int heightDivider: (parent.width < parent.height) ? 13 : 9
+        property int padding: 32
+
+        width: parent.width
+        height: parent.height - padding / 2
+        anchors.centerIn: parent
         model: apps
         highlight: highlight
         highlightFollowsCurrentItem: true
-        clip: false
+        clip: true
         cacheBuffer: 12
-        cellHeight: 128
-        cellWidth: 96
+        cellHeight: Math.floor(parent.height / heightDivider)
+        cellWidth: Math.floor(parent.width / widthDivider)
 
         add: Transition { NumberAnimation { properties: "x,y" } }
         move: Transition { NumberAnimation { properties: "x,y" } }
@@ -50,10 +58,13 @@ Item
             property variant item: model
 
             id: listItem
-            width: 80
+            width: list.cellWidth
+            height: list.cellHeight
+            padding: list.padding / 4
 
             Image
             {
+                id: icon
                 height: 64
                 width: 64
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -74,13 +85,14 @@ Item
 
             Label
             {
+                id: label
                 text: model.name
                 color: "#ffffff"
                 width: parent.width
-                wrapMode: Text.WordWrap
-                clip: true
+                wrapMode:  Text.WrapAtWordBoundaryOrAnywhere
                 horizontalAlignment: Text.AlignHCenter
                 fontSizeMode: Text.Fit
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }

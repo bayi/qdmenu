@@ -13,10 +13,9 @@
  */
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
     QLoggingCategory::setFilterRules("qt.svg.warning=false"); // Hide buggy SVG icon warnings
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
+    QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
