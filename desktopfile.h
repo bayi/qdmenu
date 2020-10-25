@@ -14,6 +14,7 @@
 #define DESKTOP_KEY_COMMENT             "Comment"
 #define DESKTOP_KEY_NODISPLAY           "NoDisplay"
 #define DESKTOP_KEY_LOCALE_NAME         "Name[%1]"
+#define DESKTOP_SHOULD_HIDE_REGEXP      "(compton|picom|x11vnc|electron|openjdk|lstopo|mpv|stoken-gui|cmake-gui|qvidcap|qv4l2|avahi-discover|bssh|bvnc)"
 
 /**
  * @brief The DesktopFile class
@@ -46,7 +47,9 @@ class DesktopFile :public QObject
     QString m_exec;
     QString m_comment;
     QString m_name;
+    bool m_hidden = false;
     bool m_noDisplay = false;
+    QRegExp m_shouldHide;
 
     bool parseFile();
 
@@ -62,6 +65,7 @@ public:
     QString comment() const;
     QString name() const;
     bool noDisplay() const;
+    bool isHidden() const;
 
 signals:
 
@@ -74,6 +78,7 @@ signals:
     void commentChanged(QString comment);
     void nameChanged(QString name);
     void noDisplayChanged(bool noDisplay);
+    void isHiddenChanged(bool isHidden);
 
 public slots:
 
@@ -86,6 +91,7 @@ public slots:
     void setComment(QString comment);
     void setName(QString name);
     void setNoDisplay(bool noDisplay);
+    void setIsHidden(bool isHidden);
 };
 
 #endif // DESKTOPFILE_H

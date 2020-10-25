@@ -6,6 +6,7 @@
 DesktopFile::DesktopFile(QString fileName, QObject* parent):
     QObject(parent), m_fileName(fileName)
 {
+    this->m_shouldHide = QRegExp(DESKTOP_SHOULD_HIDE_REGEXP);
     this->parseFile();
 }
 
@@ -22,6 +23,7 @@ bool DesktopFile::parseFile()
     this->setIcon(QString("image://appicon/%1").arg(settings.value(DESKTOP_KEY_ICON).toString()));
     this->setExec(settings.value(DESKTOP_KEY_EXEC).toString());
     this->setComment(settings.value(DESKTOP_KEY_COMMENT).toString());
+    this->setIsHidden(this->m_shouldHide.indexIn(this->exec()) != -1);
     QString name = settings.value(QString(DESKTOP_KEY_LOCALE_NAME).arg(locale)).toString();
     if (name.isEmpty())
         this->setName(settings.value(DESKTOP_KEY_NAME).toString());
@@ -74,6 +76,11 @@ QString DesktopFile::name() const
 bool DesktopFile::noDisplay() const
 {
     return m_noDisplay;
+}
+
+bool DesktopFile::isHidden() const
+{
+    return m_hidden;
 }
 
 void DesktopFile::setVersion(QString version)
@@ -155,4 +162,9 @@ void DesktopFile::setNoDisplay(bool noDisplay)
 
     m_noDisplay = noDisplay;
     emit noDisplayChanged(noDisplay);
+}
+
+void DesktopFile::setIsHidden(bool isHidden)
+{
+    m_hidden = isHidden;
 }

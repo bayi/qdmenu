@@ -31,7 +31,7 @@ void Applications::parseApplications()
     foreach(QString file, this->m_files)
     {
         DesktopFile* app = new DesktopFile(file);
-        if (!app->noDisplay() && !app->terminal())
+        if (!app->noDisplay() && !app->terminal() && !app->isHidden())
         {
             // qDebug() << "Adding application: " << app->name();
             m_internalData.append(app);
