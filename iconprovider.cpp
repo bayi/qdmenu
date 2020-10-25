@@ -75,6 +75,14 @@ QString IconProvider::searchPixmapPath(QString search)
     return QString("");
 }
 
+QPixmap IconProvider::checkIconPath(const QString &path)
+{
+    QPixmap img = QPixmap(path);
+    if (img.isNull())
+           return QPixmap(ICONPROVIDER_UNKNOWN_ICON);
+    return img;
+}
+
 QPixmap IconProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     Q_UNUSED(size);
@@ -91,7 +99,7 @@ QPixmap IconProvider::requestPixmap(const QString &id, QSize *size, const QSize 
 
     // If it is a full path ( begins with / ) then load it from the path and return it
     if (id.contains(QRegExp("^/")))
-        return QPixmap(id);
+        return this->checkIconPath(id);
 
     // If it is not a full path but has extension in the name
     if (id.contains(QRegExp(ICONPROVIDER_EXTENSION_SEARCH)))
@@ -100,14 +108,14 @@ QPixmap IconProvider::requestPixmap(const QString &id, QSize *size, const QSize 
         QString pixmapPath = this->searchPixmapPath(id);
         if (!pixmapPath.isEmpty() && pixmapPath != "")
         {
-            return QPixmap(pixmapPath);
+            return this->checkIconPath(pixmapPath);
         }
     }
 
     // Try to look it up in the /user/share/pixmaps folder
     QString pixmapPath = this->searchPixmapPath(id);
     if (!pixmapPath.isEmpty() && pixmapPath != "")
-        return QPixmap(pixmapPath);
+        return this->checkIconPath(pixmapPath);
 
     // No icon found report it and return default unknown icon
     qDebug() << "! No icon found: " << id;

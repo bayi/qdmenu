@@ -24,6 +24,8 @@ class IconProvider : public QQuickImageProvider
     QPixmap searchThemeIcon(QString search);
     QString searchPixmapPath(QString search);
 
+    QPixmap checkIconPath(const QString &path);
+
 public:
     explicit IconProvider();
 
