@@ -13,7 +13,7 @@ void Process::start(QString program, bool isTerm)
     {
         QProcess::startDetached("qdmenu-terminal", QStringList() << "-e" << command);
     } else {
-        QProcess::startDetached(command);
+        QProcess::startDetached(command, QStringList());
     }
 
     // Bye bye...

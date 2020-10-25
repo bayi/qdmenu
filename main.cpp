@@ -14,6 +14,7 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+    QLoggingCategory::setFilterRules("qt.svg.warning=false"); // Hide buggy SVG icon warnings
 
     QQmlApplicationEngine engine;
 
