@@ -13,10 +13,10 @@ void Process::start(QString program, bool isTerm)
     if (isTerm)
     {
         // qDebug() << "Starting terminal process: " << command << " args: " << args.join(',');
-        QProcess::startDetached("qdmenu-terminal", QStringList() << "-e" << command << args);
+        QProcess::startDetached("qdmenu-terminal", QStringList() << "-e" << command);
     } else {
         // qDebug() << "Starting process: " << command << " args: " << args.join(',');
-        QProcess::startDetached(command, args);
+        QProcess::startDetached(command, QStringList());
     }
 
     // Bye bye...
