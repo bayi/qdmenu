@@ -1,19 +1,22 @@
 #include "process.h"
 #include <QProcess>
+#include <qdebug.h>
 
 Process::Process(QObject *parent) : QObject(parent)
 {}
 
 void Process::start(QString program, bool isTerm)
 {
-    // Remove parameters
-    QString command = program.remove(QRegExp("%[a-zA-Z]")).trimmed();
-
+    // qDebug() << "Executing: " << program;
+    QStringList args = QProcess::splitCommand(program);
+    QString command = args.takeFirst();
     if (isTerm)
     {
-        QProcess::startDetached("qdmenu-terminal", QStringList() << "-e" << command);
+        // qDebug() << "Starting terminal process: " << command << " args: " << args.join(',');
+        QProcess::startDetached("qdmenu-terminal", QStringList() << "-e" << command << args);
     } else {
-        QProcess::startDetached(command, QStringList());
+        // qDebug() << "Starting process: " << command << " args: " << args.join(',');
+        QProcess::startDetached(command, args);
     }
 
     // Bye bye...
