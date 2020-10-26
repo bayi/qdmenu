@@ -3,9 +3,9 @@
 A dmenu like launcher program written in QT/QML. It can be used as a drop-in replacement for dmenu for example in i3 and
 other tiling window manager. There is a PKGBUILD package submitted to AUR (https://aur.archlinux.org/packages/qdmenu/)
 
-# Requirements
- - QT5 5.10+
- - QT5 SVG
+# Dependencies
+ - QT 5.10+
+ - qt5-svg, qt5-declarative, qt5-base
 
 # Features
 
@@ -30,7 +30,7 @@ other tiling window manager. There is a PKGBUILD package submitted to AUR (https
 ## Main Screen:
 ![Main screen](/screenshot1.jpg "Main screen")
 
-## Searcing:
+## Searching:
 ![Searching](/screenshot2.jpg "Searching")
 
 # Contribution
@@ -54,3 +54,4 @@ is not clear then put a comment on it, thnx ;)
 - Add modifier key for sudo/gksu/kdesu starting
 - Raw binary listing
 - Add modifier key for switching *.desktop file listing mode ( currently implemented ) and raw binary listing mode
+
