@@ -8,7 +8,7 @@
 #define ICONPROVIDER_LOCAL_ICONS_PATH   "/.local/share/icons"
 #define ICONPROVIDER_DEFAULT_SIZE       80,80
 #define ICONPROVIDER_EXTENSION_SEARCH   "\\.(?:png|xpm|svg)$"
-#define ICONPROVIDER_LOOKUP_THEMES      "Adwaita" << "gnome" <<  "HighContrast"
+#define ICONPROVIDER_LOOKUP_THEMES      "gnome" <<  "HighContrast"
 #define ICONPROVIDER_LOOKUP_EXTS        ".png" << ".xpm" << ".svg"
 
 /**
@@ -20,6 +20,7 @@ class IconProvider : public QQuickImageProvider
 {
 
     QString m_originalThemeName;
+    QStringList m_themeList;
 
     QPixmap searchThemeIcon(QString search);
     QString searchPixmapPath(QString search);

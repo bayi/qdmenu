@@ -9,6 +9,7 @@ IconProvider::IconProvider() :
 {
     // Store original theme in property
     m_originalThemeName = QIcon::themeName();
+    m_themeList << m_originalThemeName << ICONPROVIDER_LOOKUP_THEMES;
     // Add home directory icons
     QString localFolder = QDir::homePath() + ICONPROVIDER_LOCAL_ICONS_PATH;
     QStringList paths = QIcon::themeSearchPaths();
@@ -19,6 +20,7 @@ IconProvider::IconProvider() :
 
 QPixmap IconProvider::searchThemeIcon(QString search)
 {
+    // qDebug() << "Searching theme icon: " << search;
     // Remove extension
     // ( for ex.: java apps have icons specified as sun-jcontrol-jdk8.png )
     if (search.contains(QRegExp(ICONPROVIDER_EXTENSION_SEARCH)))
@@ -26,12 +28,11 @@ QPixmap IconProvider::searchThemeIcon(QString search)
         search = search.left(search.length() - 4);
     }
 
-    // Lookup in some known themes, beginning with the original theme
-    QStringList themes;
-    themes << this->m_originalThemeName << ICONPROVIDER_LOOKUP_THEMES;
-    for(int i = 0; i < themes.size(); ++i)
+    // Lookup in themes, beginning with the original theme
+    for(int i = 0; i < m_themeList.size(); ++i)
     {
-        QIcon::setThemeName(themes.at(i));
+        // qDebug() << "Searching in theme: " << m_themeList.at(i);
+        QIcon::setThemeName(m_themeList.at(i));
         if (QIcon::hasThemeIcon(search))
         {
             return QIcon::fromTheme(search).pixmap(QSize(ICONPROVIDER_DEFAULT_SIZE));
@@ -77,6 +78,7 @@ QString IconProvider::searchPixmapPath(QString search)
 
 QPixmap IconProvider::checkIconPath(const QString &path)
 {
+    // qDebug() << "Loading image: " << path;
     QPixmap img = QPixmap(path);
     if (img.isNull())
            return QPixmap(ICONPROVIDER_UNKNOWN_ICON);
