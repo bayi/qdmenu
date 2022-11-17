@@ -42,6 +42,8 @@ Window
             onMoveDown: applist.down()
             onMoveLeft: applist.left()
             onMoveRight: applist.right()
+            onMoveHome: applist.home()
+            onMoveEnd: applist.end()
             onSearchChanged: applist.filter(text)
         }
 

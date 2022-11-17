@@ -8,6 +8,8 @@ Item
     signal moveDown()
     signal moveLeft()
     signal moveRight()
+    signal moveHome()
+    signal moveEnd()
 
     Rectangle
     {
@@ -54,6 +56,14 @@ Item
             {
                 event.accepted = true
                 moveUp()
+            }
+            if (event.key === Qt.Key_Home)
+            {
+                moveHome()
+            }
+            if (event.key === Qt.Key_End)
+            {
+                moveEnd()
             }
         }
     }

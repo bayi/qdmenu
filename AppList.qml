@@ -11,6 +11,8 @@ Item
     function down() { list.moveCurrentIndexDown() }
     function left() { list.moveCurrentIndexLeft() }
     function right() { list.moveCurrentIndexRight() }
+    function home() { list.currentIndex = 0 }
+    function end() { list.currentIndex = list.count - 1 }
     function filter(text) { apps.filter(text) }
 
     Applications { id: apps }
