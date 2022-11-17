@@ -33,7 +33,7 @@ void Applications::parseApplications()
         DesktopFile* app = new DesktopFile(file);
         if (!app->noDisplay() && !app->terminal() && !app->isHidden())
         {
-            // qDebug() << "Adding application: " << app->name();
+            // qDebug() << "Found application: " << app->name();
             m_internalData.append(app);
         }
     }
@@ -143,6 +143,7 @@ QHash<int, QByteArray> Applications::roleNames() const
 
 void Applications::parseFinished()
 {
+    // qDebug() << "Parser finished";
     m_parserRunning = false;
     this->filter("");
     emit ready();
