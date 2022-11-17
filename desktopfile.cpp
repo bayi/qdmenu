@@ -6,12 +6,14 @@
 DesktopFile::DesktopFile(QString fileName, QObject* parent):
     QObject(parent), m_fileName(fileName)
 {
+    m_search_terms = QStringList();
     this->m_shouldHide = QRegExp(DESKTOP_SHOULD_HIDE_REGEXP);
     this->parseFile();
 }
 
 bool DesktopFile::parseFile()
 {
+    m_search_terms.clear();
     QString locale = QLocale::system().name().split(QRegExp("_")).at(0);
     QSettings settings(m_fileName, QSettings::IniFormat);
     settings.setIniCodec("UTF-8");
@@ -34,6 +36,12 @@ bool DesktopFile::parseFile()
     else
         this->setGenericName(genericName);
     this->setNoDisplay(settings.value(DESKTOP_KEY_NODISPLAY).toBool());
+    m_search_terms.append(name());
+    m_search_terms.append(nameLocalized());
+    m_search_terms.append(this->genericName());
+    m_search_terms.append(genericNameLocalized());
+    m_search_terms.append(comment());
+    m_search_terms.append(exec());
     return true;
 }
 
@@ -90,6 +98,11 @@ QString DesktopFile::genericName() const
 QString DesktopFile::genericNameLocalized() const
 {
     return m_generic_name_localized;
+}
+
+QStringList DesktopFile::searchTerms() const
+{
+    return m_search_terms;
 }
 
 bool DesktopFile::noDisplay() const

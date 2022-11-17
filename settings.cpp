@@ -4,7 +4,7 @@
 Settings::Settings(QObject* parent) :
   QSettings(parent)
 {
-    qDebug() << "Config loaded: " << QSettings::fileName();
+    // qDebug() << "Config loaded: " << QSettings::fileName();
 }
 
 Settings::~Settings()

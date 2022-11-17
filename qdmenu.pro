@@ -4,6 +4,8 @@ QT += qml quick svg
 CONFIG += c++11
 
 SOURCES += main.cpp \
+    applicationfinder.cpp \
+    applicationsfilter.cpp \
     desktopfile.cpp \
     applications.cpp \
     iconprovider.cpp \
@@ -35,6 +37,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    applicationfinder.h \
+    applicationsfilter.h \
     desktopfile.h \
     applications.h \
     iconprovider.h \

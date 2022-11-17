@@ -3,13 +3,8 @@
 
 #include <QAbstractListModel>
 #include <QList>
-#include <QStringList>
-#include <QtConcurrent/QtConcurrent>
+#include <applicationfinder.h>
 #include "desktopfile.h"
-
-#define APPLICATIONS_PATH       "/usr/share/applications"
-#define APPLICATIONS_LOCAL_PATH "/.local/share/applications"
-#define APPLICATIONS_FILES      "*.desktop"
 
 /**
  * @brief The Applications class
@@ -21,43 +16,41 @@ class Applications : public QAbstractListModel
 {
     Q_OBJECT
     Q_DISABLE_COPY(Applications)
-    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
-    static const int NameRole;
-    static const int IconRole;
-    static const int ExecRole;
-    static const int TerminalRole;
-    QStringList m_files;
+    ApplicationFinder m_finder;
     QList<DesktopFile*> m_data;
-    QList<DesktopFile*> m_internalData;
-    int m_count;
-    bool m_parserRunning = false;
-    QFuture<void> m_parserThread;
-    QFutureWatcher<void> m_parserThreadWatcher;
-
-    void parseApplications();
-    QStringList readFolder(QString folder);
-    void add(DesktopFile* item);
-    void sortApps();
 
 public:
     explicit Applications(QObject *parent = 0);
     virtual ~Applications();
 
+    static const int SearchRole;
+    static const int NameRole;
+    static const int NameLocalizedRole;
+    static const int GenericNameRole;
+    static const int GenericNameLocalizedRole;
+    static const int CommentRole;
+    static const int IsHiddenRole;
+    static const int IconRole;
+    static const int ExecRole;
+    static const int TerminalRole;
+
     Q_INVOKABLE DesktopFile* get(int index) const;
-    Q_INVOKABLE void filter(QString search);
+    int count() const;
 
     // QAbstractItemModel interface
-    int rowCount(const QModelIndex & = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QHash<int, QByteArray> roleNames() const;
+    virtual int rowCount(const QModelIndex & = QModelIndex()) const;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    virtual QHash<int, QByteArray> roleNames() const;
 
 signals:
-    void countChanged(int count);
+    void countChanged();
     void ready();
 
 private slots:
-    void parseFinished();
+    void append(DesktopFile* item);
+    void appsReady();
 
 };
 

@@ -1,6 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.0
-import Applications 1.0
+// import Applications 1.0
 
 Item
 {
@@ -13,9 +13,7 @@ Item
     function right() { list.moveCurrentIndexRight() }
     function home() { list.currentIndex = 0 }
     function end() { list.currentIndex = list.count - 1 }
-    function filter(text) { apps.filter(text) }
-
-    Applications { id: apps }
+    function filter(text) { apps.setFilterName(text) }
 
     Component
     {
@@ -109,7 +107,7 @@ Item
                 Label
                 {
                     id: label
-                    text: model.name
+                    text: model.name_localized
                     color: settings.get("icons/textcolor", "#ffffff")
                     width: parent.width
                     wrapMode:  Text.WrapAtWordBoundaryOrAnywhere

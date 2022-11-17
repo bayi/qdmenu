@@ -55,6 +55,7 @@ class DesktopFile :public QObject
     QString m_generic_name_localized;
     QString m_name;
     QString m_name_localized;
+    QStringList m_search_terms;
     bool m_hidden = false;
     bool m_noDisplay = false;
     QRegExp m_shouldHide;
@@ -75,6 +76,7 @@ public:
     QString nameLocalized() const;
     QString genericName() const;
     QString genericNameLocalized() const;
+    QStringList searchTerms() const;
     bool noDisplay() const;
     bool isHidden() const;
     bool contains(const QString &s);

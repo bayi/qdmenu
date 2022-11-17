@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include <QtQml>
 #include "applications.h"
+#include "applicationsfilter.h"
 #include "iconprovider.h"
 #include "process.h"
 #include "settings.h"
@@ -22,13 +23,17 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
+    Applications* applications = new Applications(app.parent());
+    ApplicationsFilter* apps = new ApplicationsFilter(app.parent());
+    apps->setSourceModel(applications);
+
     Settings* settings = new Settings();
     settings->initDefaults();
 
     qmlRegisterType<Process>("Process", 1, 0, "Process");
-    qmlRegisterType<Applications>("Applications", 1, 0, "Applications");
     engine.addImageProvider(QLatin1String("appicon"), new IconProvider);
     engine.rootContext()->setContextProperty("settings", settings);
+    engine.rootContext()->setContextProperty("apps", apps);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     if (engine.rootObjects().isEmpty())
