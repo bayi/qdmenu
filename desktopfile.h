@@ -5,6 +5,8 @@
 
 #define DESKTOP_GROUP_ENTRY_NAME        "Desktop Entry"
 #define DESKTOP_KEY_NAME                "Name"
+#define DESKTOP_KEY_GENERIC_NAME        "GenericName"
+#define DESKTOP_KEY_LOCALE_GENERIC_NAME "GenericName[%1]"
 #define DESKTOP_KEY_VERSION             "Version"
 #define DESKTOP_KEY_TERMINAL            "Terminal"
 #define DESKTOP_KEY_CATEGORIES          "Categories"
@@ -29,6 +31,9 @@ class DesktopFile :public QObject
     Q_OBJECT
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    Q_PROPERTY(QString name_localized READ nameLocalized WRITE setNameLocalized NOTIFY nameLocalizedChanged)
+    Q_PROPERTY(QString generic_name READ genericName WRITE setGenericName NOTIFY genericNameChanged)
+    Q_PROPERTY(QString generic_name_localized READ genericNameLocalized WRITE setGenericNameLocalized NOTIFY genericNameLocalizedChanged)
     Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
     Q_PROPERTY(QString exec READ exec WRITE setExec NOTIFY execChanged)
     Q_PROPERTY(QString icon READ icon WRITE setIcon NOTIFY iconChanged)
@@ -46,7 +51,10 @@ class DesktopFile :public QObject
     QString m_icon;
     QString m_exec;
     QString m_comment;
+    QString m_generic_name;
+    QString m_generic_name_localized;
     QString m_name;
+    QString m_name_localized;
     bool m_hidden = false;
     bool m_noDisplay = false;
     QRegExp m_shouldHide;
@@ -64,8 +72,12 @@ public:
     QString exec() const;
     QString comment() const;
     QString name() const;
+    QString nameLocalized() const;
+    QString genericName() const;
+    QString genericNameLocalized() const;
     bool noDisplay() const;
     bool isHidden() const;
+    bool contains(const QString &s);
 
 signals:
 
@@ -77,6 +89,9 @@ signals:
     void execChanged(QString exec);
     void commentChanged(QString comment);
     void nameChanged(QString name);
+    void nameLocalizedChanged(QString name);
+    void genericNameChanged(QString name);
+    void genericNameLocalizedChanged(QString name);
     void noDisplayChanged(bool noDisplay);
     void isHiddenChanged(bool isHidden);
 
@@ -90,6 +105,9 @@ public slots:
     void setExec(QString exec);
     void setComment(QString comment);
     void setName(QString name);
+    void setNameLocalized(QString name);
+    void setGenericName(QString name);
+    void setGenericNameLocalized(QString name);
     void setNoDisplay(bool noDisplay);
     void setIsHidden(bool isHidden);
 };

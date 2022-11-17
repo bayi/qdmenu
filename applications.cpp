@@ -70,7 +70,7 @@ void Applications::sortApps()
     std::sort(this->m_data.begin(), this->m_data.end(),
               [](const DesktopFile* left, const DesktopFile* right) -> bool
     {
-        return QString::compare(left->name(),right->name(), Qt::CaseInsensitive) < 0;
+        return QString::compare(left->nameLocalized(),right->nameLocalized(), Qt::CaseInsensitive) < 0;
     });
 }
 
@@ -87,12 +87,9 @@ void Applications::filter(QString search)
     endRemoveRows();
     foreach(DesktopFile* file, m_internalData)
     {
-        if(file->name().contains(search,Qt::CaseInsensitive)
-                || file->comment().contains(search, Qt::CaseInsensitive)
-                || file->exec().contains(search, Qt::CaseInsensitive))
-        {
+        // qDebug() "Searching in: " << file->name();
+        if (file->contains(search))
             this->add(file);
-        }
     }
     this->sortApps();
 }
@@ -114,7 +111,7 @@ QVariant Applications::data(const QModelIndex &index, int role) const
     {
         case Qt::DisplayRole:
         case NameRole:
-            return QVariant::fromValue(obj->name());
+            return QVariant::fromValue(obj->nameLocalized());
         break;
 
         case IconRole:

@@ -24,11 +24,15 @@ bool DesktopFile::parseFile()
     this->setExec(settings.value(DESKTOP_KEY_EXEC).toString());
     this->setComment(settings.value(DESKTOP_KEY_COMMENT).toString());
     this->setIsHidden(this->m_shouldHide.indexIn(this->exec()) != -1);
-    QString name = settings.value(QString(DESKTOP_KEY_LOCALE_NAME).arg(locale)).toString();
-    if (name.isEmpty())
-        this->setName(settings.value(DESKTOP_KEY_NAME).toString());
+    this->setName(settings.value(DESKTOP_KEY_NAME).toString());
+    this->setNameLocalized(settings.value(QString(DESKTOP_KEY_LOCALE_NAME).arg(locale)).toString());
+    if (nameLocalized().isEmpty())
+        this->setNameLocalized(name());
+    QString genericName = settings.value(QString(DESKTOP_KEY_LOCALE_GENERIC_NAME).arg(locale)).toString();
+    if (genericName.isEmpty())
+        this->setGenericName(settings.value(DESKTOP_KEY_GENERIC_NAME).toString());
     else
-        this->setName(name);
+        this->setGenericName(genericName);
     this->setNoDisplay(settings.value(DESKTOP_KEY_NODISPLAY).toBool());
     return true;
 }
@@ -73,6 +77,21 @@ QString DesktopFile::name() const
     return m_name;
 }
 
+QString DesktopFile::nameLocalized() const
+{
+    return m_name_localized;
+}
+
+QString DesktopFile::genericName() const
+{
+    return m_generic_name;
+}
+
+QString DesktopFile::genericNameLocalized() const
+{
+    return m_generic_name_localized;
+}
+
 bool DesktopFile::noDisplay() const
 {
     return m_noDisplay;
@@ -81,6 +100,17 @@ bool DesktopFile::noDisplay() const
 bool DesktopFile::isHidden() const
 {
     return m_hidden;
+}
+
+bool DesktopFile::contains(const QString &s)
+{
+    return name().contains(s,Qt::CaseInsensitive)
+            || nameLocalized().contains(s,Qt::CaseInsensitive)
+            || genericName().contains(s, Qt::CaseInsensitive)
+            || genericNameLocalized().contains(s, Qt::CaseInsensitive)
+            || comment().contains(s, Qt::CaseInsensitive)
+            || exec().contains(s, Qt::CaseInsensitive)
+            ;
 }
 
 void DesktopFile::setVersion(QString version)
@@ -153,6 +183,33 @@ void DesktopFile::setName(QString name)
 
     m_name = name;
     emit nameChanged(name);
+}
+
+void DesktopFile::setNameLocalized(QString name)
+{
+    if (m_name_localized == name)
+        return;
+
+    m_name_localized = name;
+    emit nameLocalizedChanged(name);
+}
+
+void DesktopFile::setGenericName(QString name)
+{
+    if (m_generic_name == name)
+        return;
+
+    m_generic_name = name;
+    emit genericNameChanged(name);
+}
+
+void DesktopFile::setGenericNameLocalized(QString name)
+{
+    if (m_generic_name_localized == name)
+        return;
+
+    m_generic_name_localized = name;
+    emit genericNameLocalizedChanged(name);
 }
 
 void DesktopFile::setNoDisplay(bool noDisplay)
