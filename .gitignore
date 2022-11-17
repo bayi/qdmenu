@@ -37,6 +37,9 @@ moc_predefs.h
 # QtCtreator CMake
 CMakeLists.txt.user*
 
+# CLang
+.qtc_clangd
+
 # Binary
 qdmenu
 
