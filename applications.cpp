@@ -67,7 +67,7 @@ void Applications::add(DesktopFile *item)
 
 void Applications::sortApps()
 {
-    std::sort(this->m_data.begin(), this->m_data.end(),
+    std::sort(this->m_internalData.begin(), this->m_internalData.end(),
               [](const DesktopFile* left, const DesktopFile* right) -> bool
     {
         return QString::compare(left->nameLocalized(),right->nameLocalized(), Qt::CaseInsensitive) < 0;
@@ -91,7 +91,6 @@ void Applications::filter(QString search)
         if (file->contains(search))
             this->add(file);
     }
-    this->sortApps();
 }
 
 int Applications::rowCount(const QModelIndex &) const
@@ -142,6 +141,7 @@ void Applications::parseFinished()
 {
     // qDebug() << "Parser finished";
     m_parserRunning = false;
+    this->sortApps();
     this->filter("");
     emit ready();
 }
