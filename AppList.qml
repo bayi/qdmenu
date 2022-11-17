@@ -22,10 +22,10 @@ Item
         id: highlight
         Rectangle
         {
-            width: list.cellWidth;
-            height: list.cellHeight
             color: settings.get("icons/selectcolor", "#2d75af")
             radius: 8
+            width: list.cellWidth - (list.padding / 2)
+            height: list.cellHeight - (list.padding / 2)
             x: list.currentItem ? list.currentItem.x : 0
             y: list.currentItem ? list.currentItem.y : 0
             Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
@@ -37,14 +37,13 @@ Item
     {
         id: list
 
-        property int widthDivider: (parent.width < parent.height) ? settings.getNumber("icons/cols", 8) : settings.getNumber("icons/rows", 8)
-        property int heightDivider: (parent.width < parent.height) ? settings.getNumber("icons/rows", 8) : settings.getNumber("icons/cols", 8)
+        property int widthDivider: (parent.width < parent.height) ? settings.getNumber("icons/rows", 8) : settings.getNumber("icons/cols", 8)
+        property int heightDivider: (parent.width < parent.height) ? settings.getNumber("icons/cols", 8) : settings.getNumber("icons/rows", 8)
         property int padding: settings.getNumber("icons/padding", 32)
 
         width: parent.width
         height: parent.height
         anchors.centerIn: parent
-        anchors.margins: padding
         model: apps
         highlight: highlight
         highlightFollowsCurrentItem: true
@@ -80,8 +79,10 @@ Item
             }
 
             Item {
-                width: list.cellWidth
-                height: list.cellHeight
+                width: list.cellWidth - (list.padding / 2)
+                height: list.cellHeight - (list.padding / 2)
+                // color: "#ff00ff"
+
                 MouseArea
                 {
                     anchors.fill: parent
@@ -100,7 +101,8 @@ Item
                     height: settings.getNumber("icons/width", 64)
                     width: settings.getNumber("icons/height", 64)
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.bottom: parent.verticalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: settings.get("icons/topmargin", 8)
                     source: model.icon
                 }
 
@@ -114,7 +116,8 @@ Item
                     horizontalAlignment: Text.AlignHCenter
                     fontSizeMode: Text.Fit
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.verticalCenter
+                    anchors.top: icon.bottom
+                    anchors.topMargin: settings.get("icons/texttopmargin", 8)
                 }
             }
 

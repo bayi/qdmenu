@@ -35,8 +35,10 @@ void Settings::initDefaults()
     checkAndSet("icons/padding", 32);
     checkAndSet("icons/cols", 8);
     checkAndSet("icons/rows", 8);
-    checkAndSet("icons/width", 64);
-    checkAndSet("icons/height", 64);
+    checkAndSet("icons/width", 96);
+    checkAndSet("icons/height", 96);
+    checkAndSet("icons/topmargin", 8);
+    checkAndSet("icons/texttopmargin", 8);
 
     checkAndSet("input/height", 32);
     checkAndSet("input/bgcolor", "#ffffff");
@@ -45,7 +47,8 @@ void Settings::initDefaults()
     checkAndSet("input/fontbold", true);
     checkAndSet("input/bordercolor", "#6795cc");
     checkAndSet("input/borderwidth", 2);
-    checkAndSet("input/borderradius", 16);
+    checkAndSet("input/borderradius", 8);
+
 }
 
 void Settings::checkAndSet(const QString &key, const QVariant &val)

@@ -15,7 +15,7 @@ Item
     {
         color: settings.get("input/bgcolor", "#ffffff")
         antialiasing: true
-        radius: settings.getNumber("input/borderradius", 16)
+        radius: settings.getNumber("input/borderradius", 8)
         anchors.fill: parent
         border.color: settings.get("input/bordercolor", "#6795cc")
         border.width: settings.getNumber("input/borderwidth", 2)
@@ -28,7 +28,7 @@ Item
         anchors.centerIn: parent
         focus: true
         font.pixelSize: settings.getNumber("input/fontsize", 24)
-        font.bold: settings.getNumber("input/fontbold", true)
+        font.bold: settings.getBool("input/fontbold", true)
         onTextChanged: searchChanged(input.text)
 
         Keys.onPressed:
