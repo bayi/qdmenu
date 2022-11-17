@@ -7,7 +7,5 @@
     <qresource prefix="/icons">
         <file>unknown.svg</file>
     </qresource>
-    <qresource prefix="/styles">
-        <file>lineedit.png</file>
-    </qresource>
+    <qresource prefix="/styles"/>
 </RCC>

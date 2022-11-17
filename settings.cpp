@@ -17,10 +17,14 @@ QVariant Settings::get(const QString &key, const QVariant &def = QVariant())
 
 void Settings::initDefaults()
 {
-    if (!QSettings::contains("color/background"))
-        QSettings::setValue("colors/background", "#000000");
-    if (!QSettings::contains("colors/selection"))
-       QSettings::setValue("colors/selection", "#2d75af");
-    if (!QSettings::contains("colors/label"))
-       QSettings::setValue("colors/label", "#ffffff");
+    checkAndSet("colors/background", "#000000");
+    checkAndSet("colors/selection", "#2d75af");
+    checkAndSet("colors/label", "#ffffff");
+    checkAndSet("colors/inputborder", "#6795cc");
+}
+
+void Settings::checkAndSet(const QString &key, const QVariant &val)
+{
+    if (!QSettings::contains("key"))
+        QSettings::setValue(key, val);
 }

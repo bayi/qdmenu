@@ -16,6 +16,9 @@ public:
 
     Q_INVOKABLE
     void initDefaults(void);
+
+private:
+    void checkAndSet(const QString &key, const QVariant &val);
 };
 
 #endif // SETTINGS_H

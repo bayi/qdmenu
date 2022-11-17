@@ -9,12 +9,12 @@ Item
     signal moveLeft()
     signal moveRight()
 
-    BorderImage
+    Rectangle
     {
-        source: "/styles/lineedit.png"
+        radius: 16
         anchors.fill: parent
-        border.left: 10; border.top: 10
-        border.right: 10; border.bottom: 10
+        border.color: settings.get("colors/inputborder", "#6795cc")
+        border.width: 2
     }
 
     TextInput
