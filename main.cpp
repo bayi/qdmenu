@@ -5,6 +5,7 @@
 #include "applications.h"
 #include "iconprovider.h"
 #include "process.h"
+#include "settings.h"
 
 /**
  * @todo: Config file in ~/.config/qmldmenu/
@@ -21,10 +22,15 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
+    Settings* settings = new Settings();
+    settings->initDefaults();
+
     qmlRegisterType<Process>("Process", 1, 0, "Process");
     qmlRegisterType<Applications>("Applications", 1, 0, "Applications");
     engine.addImageProvider(QLatin1String("appicon"), new IconProvider);
+    engine.rootContext()->setContextProperty("settings", settings);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+
     if (engine.rootObjects().isEmpty())
         return -1;
 

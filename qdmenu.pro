@@ -7,7 +7,8 @@ SOURCES += main.cpp \
     desktopfile.cpp \
     applications.cpp \
     iconprovider.cpp \
-    process.cpp
+    process.cpp \
+    settings.cpp
 
 RESOURCES += qml.qrc
 
@@ -37,4 +38,5 @@ HEADERS += \
     desktopfile.h \
     applications.h \
     iconprovider.h \
-    process.h
+    process.h \
+    settings.h

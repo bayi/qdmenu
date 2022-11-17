@@ -22,7 +22,7 @@ Item
         {
             width: list.cellWidth;
             height: list.cellHeight
-            color: "#2d75af"
+            color: settings.get("colors/selection", "#2d75af")
             radius: 8
             x: list.currentItem ? list.currentItem.x : 0
             y: list.currentItem ? list.currentItem.y : 0
@@ -105,7 +105,7 @@ Item
             {
                 id: label
                 text: model.name
-                color: "#ffffff"
+                color: settings.get("colors/label", "#ffffff")
                 width: parent.width
                 wrapMode:  Text.WrapAtWordBoundaryOrAnywhere
                 horizontalAlignment: Text.AlignHCenter

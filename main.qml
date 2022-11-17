@@ -10,7 +10,7 @@ Window
     id: root
     width: Screen.width - 1 // Multimonitor fix
     height: Screen.height - 1 // Multimonitor fix
-    color: "#000000"
+    color: settings.get("colors/background", "#000000")
     title: qsTr("qdmenu")
     visible: true
     visibility: Window.FullScreen
