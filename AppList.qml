@@ -46,10 +46,39 @@ Item
         highlight: highlight
         highlightFollowsCurrentItem: true
         clip: true
-        cacheBuffer: 12
+        // cacheBuffer: 12
 
         cellHeight: Math.floor(parent.height / heightDivider)
         cellWidth: Math.floor(parent.width / widthDivider)
+
+        add: Transition {
+            ParallelAnimation {
+                NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
+                NumberAnimation { properties: "x,y"; from: 0; duration: 200 }
+            }
+        }
+
+        addDisplaced: Transition {
+            ParallelAnimation {
+                NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
+                NumberAnimation { properties: "x,y"; from: 0; duration: 200 }
+            }
+        }
+
+        remove: Transition {
+            ParallelAnimation {
+                NumberAnimation { properties: "scale, opacity"; to: 0; duration: 200; easing.type: Easing.InOutQuad }
+                NumberAnimation { properties: "x,y"; to: 0; duration: 200 }
+            }
+        }
+
+        displaced: Transition {
+            NumberAnimation { properties: "x,y"; duration: 200 }
+        }
+
+        populate: Transition {
+            NumberAnimation { properties: "scale, opacity"; to: 1;duration: 200; easing.type: Easing.InOutQuad }
+        }
 
         // add: Transition { NumberAnimation { properties: "x,y" } }
         // move: Transition { NumberAnimation { properties: "x,y" } }
@@ -58,34 +87,18 @@ Item
         {
             property variant item: model
             id: listItem
-            // scale: 0
-            // opacity: 0
-            GridView.onAdd: SequentialAnimation {
-
-                PauseAnimation {
-                    duration: Math.random() * 50
-                }
-
-                NumberAnimation {
-                    target: listItem
-                    property: "scale"
-                    properties: "scale, opacity"
-                    to: 1
-                    duration: 200
-                    easing.type: Easing.InOutQuad
-                }
-            }
-
+            scale: 0
+            opacity: 0
             Item {
                 width: list.cellWidth - (list.padding / 2)
                 height: list.cellHeight - (list.padding / 2)
-                // color: "#ff00ff"
 
                 MouseArea
                 {
                     anchors.fill: parent
                     hoverEnabled: true
-                    onEntered: list.currentIndex = index
+                    onMouseXChanged: list.currentIndex = index
+                    onMouseYChanged: list.currentIndex = index
                     onClicked:
                     {
                         list.currentIndex = index
