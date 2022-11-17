@@ -22,7 +22,7 @@ Item
         {
             width: list.cellWidth;
             height: list.cellHeight
-            color: settings.get("colors/selection", "#2d75af")
+            color: settings.get("icons/selectcolor", "#2d75af")
             radius: 8
             x: list.currentItem ? list.currentItem.x : 0
             y: list.currentItem ? list.currentItem.y : 0
@@ -35,18 +35,20 @@ Item
     {
         id: list
 
-        property int widthDivider: (parent.width < parent.height) ? 7 : 13
-        property int heightDivider: (parent.width < parent.height) ? 13 : 9
-        property int padding: 32
+        property int widthDivider: (parent.width < parent.height) ? settings.getNumber("icons/cols", 8) : settings.getNumber("icons/rows", 8)
+        property int heightDivider: (parent.width < parent.height) ? settings.getNumber("icons/rows", 8) : settings.getNumber("icons/cols", 8)
+        property int padding: settings.getNumber("icons/padding", 32)
 
         width: parent.width
-        height: parent.height - padding / 2
+        height: parent.height
         anchors.centerIn: parent
+        anchors.margins: padding
         model: apps
         highlight: highlight
         highlightFollowsCurrentItem: true
         clip: true
         cacheBuffer: 12
+
         cellHeight: Math.floor(parent.height / heightDivider)
         cellWidth: Math.floor(parent.width / widthDivider)
 
@@ -56,14 +58,9 @@ Item
         delegate: Column
         {
             property variant item: model
-
             id: listItem
-            width: list.cellWidth
-            height: list.cellHeight
-            padding: list.padding / 4
-
-            scale: 0
-            opacity: 0
+            // scale: 0
+            // opacity: 0
             GridView.onAdd: SequentialAnimation {
 
                 PauseAnimation {
@@ -80,14 +77,9 @@ Item
                 }
             }
 
-            Image
-            {
-                id: icon
-                height: 64
-                width: 64
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: model.icon
-
+            Item {
+                width: list.cellWidth
+                height: list.cellHeight
                 MouseArea
                 {
                     anchors.fill: parent
@@ -99,19 +91,32 @@ Item
                         itemSelected(list.currentItem.item)
                     }
                 }
+
+                Image
+                {
+                    id: icon
+                    height: settings.getNumber("icons/width", 64)
+                    width: settings.getNumber("icons/height", 64)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.verticalCenter
+                    source: model.icon
+                }
+
+                Label
+                {
+                    id: label
+                    text: model.name
+                    color: settings.get("icons/textcolor", "#ffffff")
+                    width: parent.width
+                    wrapMode:  Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    fontSizeMode: Text.Fit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.verticalCenter
+                }
             }
 
-            Label
-            {
-                id: label
-                text: model.name
-                color: settings.get("colors/label", "#ffffff")
-                width: parent.width
-                wrapMode:  Text.WrapAtWordBoundaryOrAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                fontSizeMode: Text.Fit
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
+
         }
     }
 

@@ -15,6 +15,12 @@ public:
     QVariant get(const QString &key, const QVariant &def);
 
     Q_INVOKABLE
+    qreal getNumber(const QString &key, const QVariant &def);
+
+    Q_INVOKABLE
+    bool getBool(const QString &key, const QVariant &def);
+
+    Q_INVOKABLE
     void initDefaults(void);
 
 private:

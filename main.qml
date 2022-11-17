@@ -10,7 +10,7 @@ Window
     id: root
     width: Screen.width - 1 // Multimonitor fix
     height: Screen.height - 1 // Multimonitor fix
-    color: settings.get("colors/background", "#000000")
+    color: settings.get("background/bgcolor", "#000000")
     title: qsTr("qdmenu")
     visible: true
     visibility: Window.FullScreen
@@ -27,10 +27,10 @@ Window
 
         CommandInput
         {
-            Layout.topMargin: 16
+            Layout.topMargin: settings.get("background/topmargin", 16)
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: parent.width / 4
-            Layout.preferredHeight: 32
+            Layout.preferredHeight: settings.getNumber("input/height", 32)
             onItemSelected:
             {
                 if (applist.current() === null)

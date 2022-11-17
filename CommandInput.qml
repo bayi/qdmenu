@@ -11,19 +11,22 @@ Item
 
     Rectangle
     {
-        radius: 16
+        color: settings.get("input/bgcolor", "#ffffff")
+        antialiasing: true
+        radius: settings.getNumber("input/borderradius", 16)
         anchors.fill: parent
-        border.color: settings.get("colors/inputborder", "#6795cc")
-        border.width: 2
+        border.color: settings.get("input/bordercolor", "#6795cc")
+        border.width: settings.getNumber("input/borderwidth", 2)
     }
 
     TextInput
     {
         id: input
+        color: settings.get("input/textcolor", "#000000")
         anchors.centerIn: parent
         focus: true
-        font.pixelSize: 24
-        font.bold: true
+        font.pixelSize: settings.getNumber("input/fontsize", 24)
+        font.bold: settings.getNumber("input/fontbold", true)
         onTextChanged: searchChanged(input.text)
 
         Keys.onPressed:
