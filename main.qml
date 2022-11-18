@@ -1,9 +1,6 @@
-import QtQuick 2.10
-import QtQuick.Window 2.2
-import QtQuick.Layouts 1.2
-import Qt.labs.folderlistmodel 1.0
-import QtLocation 5.3
-import Process 1.0
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtQuick.Layouts 1.12
 
 Window
 {
@@ -11,19 +8,33 @@ Window
     width: Screen.width - 1 // Multimonitor fix
     height: Screen.height - 1 // Multimonitor fix
     color: settings.get("background/bgcolor", "#000000")
-    title: qsTr("qdmenu")
+    title: qsTr("QDMenu")
     visible: true
     visibility: Window.FullScreen
-    flags: Qt.FramelessWindowHint | Qt.WA_TranslucentBackground
+    flags: Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint
+    opacity: 0
 
-    Process { id: process }
+    onActiveChanged: {
+        if (!active) {
+            // console.log('Lost focus, exiting.')
+            // Qt.quit()
+        }
+    }
+
+    NumberAnimation on opacity {
+        from: 0
+        to: 1
+        duration: 500
+        running: true
+    }
 
     ColumnLayout
     {
         anchors.fill: parent
         width: parent.width
         height: parent.height
-        spacing: 1
+        spacing: 8
+        anchors.margins: 16
 
         CommandInput
         {
@@ -51,6 +62,7 @@ Window
         {
             id: applist
             Layout.preferredWidth: parent.width
+            Layout.fillWidth: true
             Layout.fillHeight: true
             onItemSelected: process.start(app.exec, app.terminal)
         }
