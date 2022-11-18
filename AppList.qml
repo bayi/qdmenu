@@ -1,6 +1,5 @@
-import QtQuick 2.10
-import QtQuick.Controls 2.0
-// import Applications 1.0
+import QtQuick 2.12
+import QtQuick.Controls 2.12
 
 Item
 {
@@ -56,31 +55,28 @@ Item
 
         add: Transition {
             ParallelAnimation {
-                NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
-                NumberAnimation { properties: "x,y"; from: 0; duration: 200 }
+                NumberAnimation { properties: "scale"; from: 0; to: 1; duration: 250; easing.type: Easing.InOutQuad }
             }
         }
 
         addDisplaced: Transition {
             ParallelAnimation {
-                NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
-                NumberAnimation { properties: "x,y"; from: 0; duration: 200 }
+                NumberAnimation { properties: "scale"; to: 1; duration: 250; easing.type: Easing.InOutQuad }
             }
         }
 
         remove: Transition {
             ParallelAnimation {
-                NumberAnimation { properties: "scale, opacity"; to: 0; duration: 200; easing.type: Easing.InOutQuad }
-                NumberAnimation { properties: "x,y"; to: 0; duration: 200 }
+                NumberAnimation { properties: "scale"; from:1; to: 0; duration: 250; easing.type: Easing.InOutQuad }
             }
         }
 
         displaced: Transition {
-            NumberAnimation { properties: "x,y"; duration: 200 }
+            NumberAnimation { properties: "x,y"; duration: 250 }
         }
 
         populate: Transition {
-            NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
+            NumberAnimation { properties: "scale"; from: 0; to: 1; duration: 250; easing.type: Easing.InOutQuad }
         }
 
         delegate: Column
@@ -93,6 +89,8 @@ Item
                 MouseArea
                 {
                     anchors.fill: parent
+                    hoverEnabled: true
+                    // onEntered: list.currentIndex = index
                     onClicked:
                     {
                         if (list.currentIndex === index && list.currentItem.item)
