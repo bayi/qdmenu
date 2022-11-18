@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 
 Item
 {
@@ -11,6 +11,7 @@ Item
     signal moveHome()
     signal moveEnd()
 
+    property string placeholderText: qsTr("Enter application/command/name")
 
     Timer
     {
@@ -43,47 +44,34 @@ Item
     TextInput
     {
         id: input
-        color: settings.get("input/textcolor", "#000000")
-        anchors.centerIn: parent
         focus: true
-        font.pixelSize: settings.getNumber("input/fontsize", 24)
-        font.bold: settings.getBool("input/fontbold", true)
-        onTextChanged: debounce(input.text)
+        anchors.fill: parent
+        horizontalAlignment: "AlignHCenter"
+        color: settings.get("input/textcolor", "#000000")
 
+        font.pixelSize: settings.getNumber("input/fontsize", 16)
+        font.bold: settings.getBool("input/fontbold", true)
+
+        onTextEdited: debounce(input.text)
+        onAccepted: itemSelected(input.text)
         Keys.onPressed:
         {
-            if (event.key === Qt.Key_Escape)
-                close();
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                itemSelected(input.text);
-            if (event.key === Qt.Key_Left)
-            {
-                event.accepted = true
-                moveLeft()
-            }
-            if (event.key === Qt.Key_Right)
-            {
-                event.accepted = true
-                moveRight()
-            }
-            if (event.key === Qt.Key_Down)
-            {
-                event.accepted = true
-                moveDown()
-            }
-            if (event.key === Qt.Key_Up)
-            {
-                event.accepted = true
-                moveUp()
-            }
-            if (event.key === Qt.Key_Home)
-            {
-                moveHome()
-            }
-            if (event.key === Qt.Key_End)
-            {
-                moveEnd()
-            }
+            if (event.key === Qt.Key_Escape) Qt.quit();
+            if (event.key === Qt.Key_Left) { event.accepted = true; moveLeft(); }
+            if (event.key === Qt.Key_Right) { event.accepted = true; moveRight() }
+            if (event.key === Qt.Key_Down) { event.accepted = true; moveDown(); }
+            if (event.key === Qt.Key_Up) { event.accepted = true; moveUp();}
+            if (event.key === Qt.Key_Home) moveHome();
+            if (event.key === Qt.Key_End) moveEnd();
+        }
+
+        Text {
+            id: placeholder
+            color: "grey"
+            visible: !input.text /* && !input.activeFocus */
+            text: placeholderText
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 
