@@ -23,21 +23,29 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("bayi.hu");
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
-
+    QQmlContext* context = engine.rootContext();
     Applications* applications = new Applications(app.parent());
     ApplicationsFilter* apps = new ApplicationsFilter(app.parent());
-    apps->setSourceModel(applications);
-    apps->sort(0, Qt::AscendingOrder);
-    apps->setDynamicSortFilter(false);
 
     Settings* settings = new Settings();
     settings->initDefaults();
 
+    apps->setSourceModel(applications);
+    apps->sort(0, Qt::AscendingOrder);
+    apps->setDynamicSortFilter(false);
+
     qmlRegisterType<Process>("Process", 1, 0, "Process");
+    context->setContextProperty("settings", settings);
+    context->setContextProperty("apps", apps);
+
+    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+                     &app, [url](QObject *obj, const QUrl &objUrl) {
+        if (!obj && url == objUrl)
+            QCoreApplication::exit(-1);
+    }, Qt::QueuedConnection);
     engine.addImageProvider(QLatin1String("appicon"), new IconProvider);
-    engine.rootContext()->setContextProperty("settings", settings);
-    engine.rootContext()->setContextProperty("apps", apps);
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(url);
 
     if (engine.rootObjects().isEmpty())
         return -1;
