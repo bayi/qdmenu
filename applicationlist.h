@@ -1,10 +1,10 @@
-#ifndef APPLICATIONS_H
-#define APPLICATIONS_H
+#ifndef APPLICATIONLIST_H
+#define APPLICATIONLIST_H
 
 #include <QAbstractListModel>
 #include <QList>
 #include <applicationfinder.h>
-#include "desktopfile.h"
+#include "application.h"
 
 /**
  * @brief The Applications class
@@ -12,18 +12,18 @@
  * Generates a list of applications from desktop files
  *
  */
-class Applications : public QAbstractListModel
+class ApplicationList : public QAbstractListModel
 {
     Q_OBJECT
-    Q_DISABLE_COPY(Applications)
+    Q_DISABLE_COPY(ApplicationList)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
     ApplicationFinder m_finder;
-    QList<DesktopFile*> m_data;
+    QList<Application*> m_data;
 
 public:
-    explicit Applications(QObject *parent = 0);
-    virtual ~Applications();
+    explicit ApplicationList(QObject *parent = 0);
+    virtual ~ApplicationList();
 
     static const int SearchRole;
     static const int NameRole;
@@ -48,9 +48,9 @@ signals:
     void ready();
 
 private slots:
-    void append(DesktopFile* item);
+    void append(Application* item);
     void appsReady();
 
 };
 
-#endif // APPLICATIONS_H
+#endif // APPLICATIONLIST_H

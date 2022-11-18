@@ -1,9 +1,9 @@
-#include "desktopfile.h"
+#include "application.h"
 #include <QFile>
 #include <QSettings>
 #include <qdebug.h>
 
-DesktopFile::DesktopFile(QString fileName, QObject* parent):
+Application::Application(QString fileName, QObject* parent):
     QObject(parent), m_fileName(fileName)
 {
     m_search_terms = QStringList();
@@ -11,7 +11,7 @@ DesktopFile::DesktopFile(QString fileName, QObject* parent):
     this->parseFile();
 }
 
-bool DesktopFile::parseFile()
+bool Application::parseFile()
 {
     m_search_terms.clear();
     QString locale = QLocale::system().name().split(QRegExp("_")).at(0);
@@ -45,77 +45,77 @@ bool DesktopFile::parseFile()
     return true;
 }
 
-QString DesktopFile::version() const
+QString Application::version() const
 {
     return m_version;
 }
 
-bool DesktopFile::terminal() const
+bool Application::terminal() const
 {
     return m_terminal;
 }
 
-QStringList DesktopFile::categories() const
+QStringList Application::categories() const
 {
     return m_categories;
 }
 
-QString DesktopFile::type() const
+QString Application::type() const
 {
     return m_type;
 }
 
-QString DesktopFile::icon() const
+QString Application::icon() const
 {
     return m_icon;
 }
 
-QString DesktopFile::exec() const
+QString Application::exec() const
 {
     return m_exec;
 }
 
-QString DesktopFile::comment() const
+QString Application::comment() const
 {
     return m_comment;
 }
 
-QString DesktopFile::name() const
+QString Application::name() const
 {
     return m_name;
 }
 
-QString DesktopFile::nameLocalized() const
+QString Application::nameLocalized() const
 {
     return m_name_localized;
 }
 
-QString DesktopFile::genericName() const
+QString Application::genericName() const
 {
     return m_generic_name;
 }
 
-QString DesktopFile::genericNameLocalized() const
+QString Application::genericNameLocalized() const
 {
     return m_generic_name_localized;
 }
 
-QStringList DesktopFile::searchTerms() const
+QStringList Application::searchTerms() const
 {
     return m_search_terms;
 }
 
-bool DesktopFile::noDisplay() const
+bool Application::noDisplay() const
 {
     return m_noDisplay;
 }
 
-bool DesktopFile::isHidden() const
+bool Application::isHidden() const
 {
     return m_hidden;
 }
 
-bool DesktopFile::contains(const QString &s)
+bool Application::contains(const QString &s)
 {
     return name().contains(s,Qt::CaseInsensitive)
             || nameLocalized().contains(s,Qt::CaseInsensitive)
@@ -126,7 +126,7 @@ bool DesktopFile::contains(const QString &s)
             ;
 }
 
-void DesktopFile::setVersion(QString version)
+void Application::setVersion(QString version)
 {
     if (m_version == version)
         return;
@@ -135,7 +135,7 @@ void DesktopFile::setVersion(QString version)
     emit versionChanged(version);
 }
 
-void DesktopFile::setTerminal(bool terminal)
+void Application::setTerminal(bool terminal)
 {
     if (m_terminal == terminal)
         return;
@@ -144,7 +144,7 @@ void DesktopFile::setTerminal(bool terminal)
     emit terminalChanged(terminal);
 }
 
-void DesktopFile::setCategories(QStringList categories)
+void Application::setCategories(QStringList categories)
 {
     if (m_categories == categories)
         return;
@@ -153,7 +153,7 @@ void DesktopFile::setCategories(QStringList categories)
     emit categoriesChanged(categories);
 }
 
-void DesktopFile::setType(QString type)
+void Application::setType(QString type)
 {
     if (m_type == type)
         return;
@@ -162,7 +162,7 @@ void DesktopFile::setType(QString type)
     emit typeChanged(type);
 }
 
-void DesktopFile::setIcon(QString icon)
+void Application::setIcon(QString icon)
 {
     if (m_icon == icon)
         return;
@@ -171,7 +171,7 @@ void DesktopFile::setIcon(QString icon)
     emit iconChanged(icon);
 }
 
-void DesktopFile::setExec(QString exec)
+void Application::setExec(QString exec)
 {
     if (m_exec == exec)
         return;
@@ -180,7 +180,7 @@ void DesktopFile::setExec(QString exec)
     emit execChanged(exec);
 }
 
-void DesktopFile::setComment(QString comment)
+void Application::setComment(QString comment)
 {
     if (m_comment == comment)
         return;
@@ -189,7 +189,7 @@ void DesktopFile::setComment(QString comment)
     emit commentChanged(comment);
 }
 
-void DesktopFile::setName(QString name)
+void Application::setName(QString name)
 {
     if (m_name == name)
         return;
@@ -198,7 +198,7 @@ void DesktopFile::setName(QString name)
     emit nameChanged(name);
 }
 
-void DesktopFile::setNameLocalized(QString name)
+void Application::setNameLocalized(QString name)
 {
     if (m_name_localized == name)
         return;
@@ -207,7 +207,7 @@ void DesktopFile::setNameLocalized(QString name)
     emit nameLocalizedChanged(name);
 }
 
-void DesktopFile::setGenericName(QString name)
+void Application::setGenericName(QString name)
 {
     if (m_generic_name == name)
         return;
@@ -216,7 +216,7 @@ void DesktopFile::setGenericName(QString name)
     emit genericNameChanged(name);
 }
 
-void DesktopFile::setGenericNameLocalized(QString name)
+void Application::setGenericNameLocalized(QString name)
 {
     if (m_generic_name_localized == name)
         return;
@@ -225,7 +225,7 @@ void DesktopFile::setGenericNameLocalized(QString name)
     emit genericNameLocalizedChanged(name);
 }
 
-void DesktopFile::setNoDisplay(bool noDisplay)
+void Application::setNoDisplay(bool noDisplay)
 {
     if (m_noDisplay == noDisplay)
         return;
@@ -234,7 +234,7 @@ void DesktopFile::setNoDisplay(bool noDisplay)
     emit noDisplayChanged(noDisplay);
 }
 
-void DesktopFile::setIsHidden(bool isHidden)
+void Application::setIsHidden(bool isHidden)
 {
     m_hidden = isHidden;
 }

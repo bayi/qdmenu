@@ -7,7 +7,7 @@ void ApplicationFinder::work()
     this->m_files.append(this->readFolder(APPLICATIONS_PATH));
     foreach(QString file, this->m_files)
     {
-        DesktopFile* app = new DesktopFile(file);
+        Application* app = new Application(file);
         // qDebug() << "Found application: " << app->name();
         emit appFound(app);
     }

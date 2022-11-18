@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtConcurrent/QtConcurrent>
-#include "desktopfile.h"
+#include "application.h"
 
 #define APPLICATIONS_PATH       "/usr/share/applications"
 #define APPLICATIONS_LOCAL_PATH "/.local/share/applications"
@@ -28,7 +28,7 @@ public:
 
 signals:
     void isReady();
-    void appFound(DesktopFile*);
+    void appFound(Application*);
 
 private slots:
     void workFinished();

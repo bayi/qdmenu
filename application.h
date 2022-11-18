@@ -1,5 +1,5 @@
-#ifndef DESKTOPFILE_H
-#define DESKTOPFILE_H
+#ifndef APPLICATION_H
+#define APPLICATION_H
 
 #include <QObject>
 
@@ -26,7 +26,7 @@
  * @todo: Parse multiple categories seperated by ;
  */
 
-class DesktopFile :public QObject
+class Application :public QObject
 {
     Q_OBJECT
 
@@ -63,7 +63,7 @@ class DesktopFile :public QObject
     bool parseFile();
 
 public:
-    explicit DesktopFile(QString fileName, QObject* parent = 0);
+    explicit Application(QString fileName, QObject* parent = 0);
 
     QString version() const;
     bool terminal() const;
@@ -114,4 +114,4 @@ public slots:
     void setIsHidden(bool isHidden);
 };
 
-#endif // DESKTOPFILE_H
+#endif // APPLICATION_H

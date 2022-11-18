@@ -1,15 +1,15 @@
-#ifndef APPLICATIONSFILTER_H
-#define APPLICATIONSFILTER_H
+#ifndef APPLICATIONFILTER_H
+#define APPLICATIONFILTER_H
 
 #include <QSortFilterProxyModel>
 #include <QObject>
 
-class ApplicationsFilter : public QSortFilterProxyModel
+class ApplicationFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
     QString m_filter_name;
 public:
-    explicit ApplicationsFilter(QObject *parent = nullptr);
+    explicit ApplicationFilter(QObject *parent = nullptr);
 
 
     QString filterName() const { return m_filter_name; }
@@ -20,4 +20,4 @@ protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
 
-#endif // APPLICATIONSFILTER_H
+#endif // APPLICATIONFILTER_H

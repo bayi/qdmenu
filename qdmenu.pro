@@ -5,10 +5,10 @@ CONFIG += c++11
 #CONFIG += console
 
 SOURCES += main.cpp \
+    application.cpp \
+    applicationfilter.cpp \
     applicationfinder.cpp \
-    applicationsfilter.cpp \
-    desktopfile.cpp \
-    applications.cpp \
+    applicationlist.cpp \
     iconprovider.cpp \
     process.cpp \
     settings.cpp
@@ -38,10 +38,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    application.h \
+    applicationfilter.h \
     applicationfinder.h \
-    applicationsfilter.h \
-    desktopfile.h \
-    applications.h \
+    applicationlist.h \
     iconprovider.h \
     process.h \
     settings.h

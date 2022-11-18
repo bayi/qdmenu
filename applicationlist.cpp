@@ -1,49 +1,49 @@
-#include "applications.h"
+#include "applicationlist.h"
 #include <QDir>
 #include <qdebug.h>
 
-const int Applications::SearchRole = Qt::UserRole + 1;
-const int Applications::NameRole = Qt::UserRole + 2;
-const int Applications::NameLocalizedRole = Qt::UserRole + 3;
-const int Applications::GenericNameRole = Qt::UserRole + 4;
-const int Applications::GenericNameLocalizedRole = Qt::UserRole + 5;
-const int Applications::CommentRole = Qt::UserRole + 6;
-const int Applications::IsHiddenRole = Qt::UserRole + 7;
-const int Applications::IconRole = Qt::UserRole + 8;
-const int Applications::ExecRole = Qt::UserRole + 9;
-const int Applications::TerminalRole = Qt::UserRole + 10;
+const int ApplicationList::SearchRole = Qt::UserRole + 1;
+const int ApplicationList::NameRole = Qt::UserRole + 2;
+const int ApplicationList::NameLocalizedRole = Qt::UserRole + 3;
+const int ApplicationList::GenericNameRole = Qt::UserRole + 4;
+const int ApplicationList::GenericNameLocalizedRole = Qt::UserRole + 5;
+const int ApplicationList::CommentRole = Qt::UserRole + 6;
+const int ApplicationList::IsHiddenRole = Qt::UserRole + 7;
+const int ApplicationList::IconRole = Qt::UserRole + 8;
+const int ApplicationList::ExecRole = Qt::UserRole + 9;
+const int ApplicationList::TerminalRole = Qt::UserRole + 10;
 
-Applications::Applications(QObject *parent) :
+ApplicationList::ApplicationList(QObject *parent) :
     QAbstractListModel(parent)
 {
-    connect(&m_finder, SIGNAL(appFound(DesktopFile*)), this, SLOT(append(DesktopFile*)));
+    connect(&m_finder, SIGNAL(appFound(Application*)), this, SLOT(append(Application*)));
     connect(&m_finder, SIGNAL(isReady()), this, SLOT(appsReady()));
     m_finder.run();
 }
 
-Applications::~Applications()
+ApplicationList::~ApplicationList()
 {
     qDeleteAll(this->m_data);
 }
 
-int Applications::count() const
+int ApplicationList::count() const
 {
     return m_data.count();
 }
 
-int Applications::rowCount(const QModelIndex &) const
+int ApplicationList::rowCount(const QModelIndex &) const
 {
     return count();
 }
 
-QVariant Applications::data(const QModelIndex &index, int role) const
+QVariant ApplicationList::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())
         return QVariant();
     if (index.row() > (m_data.size()-1) )
         return QVariant();
 
-    DesktopFile* obj = m_data.at(index.row());
+    Application* obj = m_data.at(index.row());
     switch(role)
     {
         case SearchRole:
@@ -82,7 +82,7 @@ QVariant Applications::data(const QModelIndex &index, int role) const
     }
 }
 
-QHash<int, QByteArray> Applications::roleNames() const
+QHash<int, QByteArray> ApplicationList::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
     roles.insert(SearchRole, QByteArray("search"));
@@ -98,7 +98,7 @@ QHash<int, QByteArray> Applications::roleNames() const
     return roles;
 }
 
-void Applications::append(DesktopFile *item)
+void ApplicationList::append(Application *item)
 {
     // @TODO: Setting/Key for showing hidden items
     if (!item->noDisplay() && !item->terminal() && !item->isHidden())
@@ -111,7 +111,7 @@ void Applications::append(DesktopFile *item)
     }
 }
 
-void Applications::appsReady()
+void ApplicationList::appsReady()
 {
     // qDebug() << "Apps Ready";
     emit ready();

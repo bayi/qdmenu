@@ -2,7 +2,7 @@
 #define PROESS_H
 
 #include <QObject>
-#include "desktopfile.h"
+#include "application.h"
 
 /**
  * @brief The Process class

@@ -2,8 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QtQml>
-#include "applications.h"
-#include "applicationsfilter.h"
+#include "applicationlist.h"
+#include "applicationfilter.h"
 #include "iconprovider.h"
 #include "process.h"
 #include "settings.h"
@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     QQmlContext* context = engine.rootContext();
-    Applications* applications = new Applications(app.parent());
-    ApplicationsFilter* apps = new ApplicationsFilter(app.parent());
+    ApplicationList* applications = new ApplicationList(app.parent());
+    ApplicationFilter* apps = new ApplicationFilter(app.parent());
 
     Settings* settings = new Settings();
     settings->initDefaults();
