@@ -11,6 +11,25 @@ Item
     signal moveHome()
     signal moveEnd()
 
+
+    Timer
+    {
+        property var payload: []
+        id: timer
+        interval: 200
+        onTriggered: { doSearch(payload.text); }
+    }
+
+    function debounce(text) {
+        timer.payload = { text: text};
+        if (timer.running) return;
+        timer.start();
+    }
+
+    function doSearch(text) {
+        searchChanged(text);
+    }
+
     Rectangle
     {
         color: settings.get("input/bgcolor", "#ffffff")
@@ -29,7 +48,7 @@ Item
         focus: true
         font.pixelSize: settings.getNumber("input/fontsize", 24)
         font.bold: settings.getBool("input/fontbold", true)
-        onTextChanged: searchChanged(input.text)
+        onTextChanged: debounce(input.text)
 
         Keys.onPressed:
         {

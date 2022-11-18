@@ -15,6 +15,9 @@ Item
     function end() { list.currentIndex = list.count - 1 }
     function filter(text) { apps.setFilterName(text) }
 
+    property int itemWidth: list.cellWidth - (list.padding / 2)
+    property int itemHeight: list.cellHeight - (list.padding / 2)
+
     Component
     {
         id: highlight
@@ -22,8 +25,8 @@ Item
         {
             color: settings.get("icons/selectcolor", "#2d75af")
             radius: 8
-            width: list.cellWidth - (list.padding / 2)
-            height: list.cellHeight - (list.padding / 2)
+            width: itemWidth
+            height: itemHeight
             x: list.currentItem ? list.currentItem.x : 0
             y: list.currentItem ? list.currentItem.y : 0
             Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
@@ -46,7 +49,7 @@ Item
         highlight: highlight
         highlightFollowsCurrentItem: true
         clip: true
-        // cacheBuffer: 12
+        cacheBuffer: 64
 
         cellHeight: Math.floor(parent.height / heightDivider)
         cellWidth: Math.floor(parent.width / widthDivider)
@@ -77,44 +80,37 @@ Item
         }
 
         populate: Transition {
-            NumberAnimation { properties: "scale, opacity"; to: 1;duration: 200; easing.type: Easing.InOutQuad }
+            NumberAnimation { properties: "scale, opacity"; to: 1; duration: 200; easing.type: Easing.InOutQuad }
         }
-
-        // add: Transition { NumberAnimation { properties: "x,y" } }
-        // move: Transition { NumberAnimation { properties: "x,y" } }
 
         delegate: Column
         {
             property variant item: model
             id: listItem
-            scale: 0
-            opacity: 0
             Item {
-                width: list.cellWidth - (list.padding / 2)
-                height: list.cellHeight - (list.padding / 2)
-
+                width: itemWidth
+                height: itemHeight
                 MouseArea
                 {
                     anchors.fill: parent
-                    hoverEnabled: true
-                    onMouseXChanged: list.currentIndex = index
-                    onMouseYChanged: list.currentIndex = index
                     onClicked:
                     {
+                        if (list.currentIndex === index && list.currentItem.item)
+                            itemSelected(list.currentItem.item)
                         list.currentIndex = index
-                        itemSelected(list.currentItem.item)
                     }
                 }
 
                 Image
                 {
                     id: icon
+                    source: model.icon
+                    cache: true
                     height: settings.getNumber("icons/width", 64)
                     width: settings.getNumber("icons/height", 64)
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: settings.get("icons/topmargin", 8)
-                    source: model.icon
                 }
 
                 Label
@@ -131,9 +127,6 @@ Item
                     anchors.topMargin: settings.get("icons/texttopmargin", 8)
                 }
             }
-
-
         }
     }
-
 }

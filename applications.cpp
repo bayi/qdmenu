@@ -26,11 +26,6 @@ Applications::~Applications()
     qDeleteAll(this->m_data);
 }
 
-DesktopFile* Applications::get(int index) const
-{
-    return m_data.at(index);
-}
-
 int Applications::count() const
 {
     return m_data.count();
@@ -105,8 +100,10 @@ QHash<int, QByteArray> Applications::roleNames() const
 
 void Applications::append(DesktopFile *item)
 {
+    // @TODO: Setting/Key for showing hidden items
     if (!item->noDisplay() && !item->terminal() && !item->isHidden())
     {
+        // qDebug() << "Adding app:" << item->name();
         beginInsertRows(QModelIndex(), m_data.count(), m_data.count());
         m_data.append(item);
         endInsertRows();
@@ -116,5 +113,6 @@ void Applications::append(DesktopFile *item)
 
 void Applications::appsReady()
 {
+    // qDebug() << "Apps Ready";
     emit ready();
 }

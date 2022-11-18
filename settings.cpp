@@ -35,8 +35,8 @@ void Settings::initDefaults()
     checkAndSet("icons/padding", 32);
     checkAndSet("icons/cols", 8);
     checkAndSet("icons/rows", 8);
-    checkAndSet("icons/width", 96);
-    checkAndSet("icons/height", 96);
+    checkAndSet("icons/width", 64);
+    checkAndSet("icons/height", 64);
     checkAndSet("icons/topmargin", 8);
     checkAndSet("icons/texttopmargin", 8);
 

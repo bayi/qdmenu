@@ -36,7 +36,6 @@ public:
     static const int ExecRole;
     static const int TerminalRole;
 
-    Q_INVOKABLE DesktopFile* get(int index) const;
     int count() const;
 
     // QAbstractItemModel interface

@@ -9,7 +9,6 @@
 #include "settings.h"
 
 /**
- * @todo: Config file in ~/.config/qmldmenu/
  * @todo: SHIFT(ENTER) for sudo
  * @todo: TAB For command (term /{usr}/bin/) / app (.desktop) mode
  */
@@ -26,6 +25,8 @@ int main(int argc, char *argv[])
     Applications* applications = new Applications(app.parent());
     ApplicationsFilter* apps = new ApplicationsFilter(app.parent());
     apps->setSourceModel(applications);
+    apps->sort(0, Qt::AscendingOrder);
+    apps->setDynamicSortFilter(false);
 
     Settings* settings = new Settings();
     settings->initDefaults();
