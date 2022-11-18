@@ -3,15 +3,52 @@
 #include <QSettings>
 #include <qdebug.h>
 
+bool readDesktopFile(QIODevice &device, QSettings::SettingsMap &map)
+{
+    QTextStream stream(&device);
+    QString currentSection;
+    bool isValid = false;
+    for (QString line = stream.readLine(); !line.isNull(); line=stream.readLine())
+    {
+        line = line.trimmed();
+        if (line.isEmpty() && line.startsWith(QLatin1Char('#'))) continue; // If line is empty or is a comment skip it
+        if (line.startsWith(QLatin1Char('['))) { // Section start
+            currentSection = line.mid(1, line.size() - 2).trimmed();
+            if (currentSection == "Desktop Entry") isValid = true;
+            continue;
+        }
+        if (currentSection.isEmpty() || currentSection != "Desktop Entry") continue; // If not in 'Desktop Entry' section yet .. continue
+        QString key = line.section('=', 0,0).trimmed(); // Key is the part before the first =
+        QString value = line.section('=', 1, -1).trimmed(); // Value is the part after the first =
+        if (value.contains(QLatin1Char(';')))
+            map.insert(key, value.split(QLatin1Char(';'), Qt::SplitBehaviorFlags::SkipEmptyParts)); // If the value contains ; then its an array so split it
+        else
+            map.insert(key, value);
+
+    }
+    return isValid;
+}
+
+bool writeDesktopFile(QIODevice &device, const QSettings::SettingsMap &map)
+{
+    Q_UNUSED(device);
+    Q_UNUSED(map);
+    qInfo() << "Only reading of desktop files in supported!";
+    return true;
+}
+
+// Ignore non-pdo-global-static
+const QSettings::Format DesktopFileFormat = QSettings::registerFormat("desktopfile", readDesktopFile, writeDesktopFile);
+
 Application::Application(QString fileName, QObject* parent):
     QObject(parent), m_fileName(fileName)
 {
     m_search_terms = QStringList();
     this->m_shouldHide = QRegExp(DESKTOP_SHOULD_HIDE_REGEXP);
-    this->parseFile();
+    this->parse();
 }
 
-bool Application::parseFile()
+bool Application::parse()
 {
     m_search_terms.clear();
     QString locale = QLocale::system().name().split(QRegExp("_")).at(0);
@@ -43,6 +80,16 @@ bool Application::parseFile()
     m_search_terms.append(comment());
     m_search_terms.append(exec());
     return true;
+}
+
+bool Application::run()
+{
+
+}
+
+QString Application::fileName() const
+{
+    return m_fileName;
 }
 
 QString Application::version() const
@@ -115,15 +162,17 @@ bool Application::isHidden() const
     return m_hidden;
 }
 
-bool Application::contains(const QString &s)
+bool Application::isValid() const
 {
-    return name().contains(s,Qt::CaseInsensitive)
-            || nameLocalized().contains(s,Qt::CaseInsensitive)
-            || genericName().contains(s, Qt::CaseInsensitive)
-            || genericNameLocalized().contains(s, Qt::CaseInsensitive)
-            || comment().contains(s, Qt::CaseInsensitive)
-            || exec().contains(s, Qt::CaseInsensitive)
-            ;
+    return m_is_valid;
+}
+
+void Application::setFileName(QString fileName)
+{
+    if (m_fileName == fileName)
+        return;
+    m_fileName = fileName;
+    emit fileNameChanged(fileName);
 }
 
 void Application::setVersion(QString version)
@@ -237,4 +286,50 @@ void Application::setNoDisplay(bool noDisplay)
 void Application::setIsHidden(bool isHidden)
 {
     m_hidden = isHidden;
+}
+
+void Application::setIsValid(bool isValid)
+{
+    m_is_valid = isValid;
+}
+
+QVariant Application::getLocalizedValue(QSettings &settings, QString locale, QString key)
+{
+    QString localizedKey = key;
+    QVariant value = settings.value(localizedKey.append("[%1]").arg(locale));
+    if (value.toString().isEmpty()) return settings.value(key);
+    return value;
+}
+
+QString Application::escapeValue(QString value)
+{
+    // http://standards.freedesktop.org/desktop-entry-spec/latest/ar01s03.html
+    QString result;
+    bool inEscapeSeq = false;
+    for (auto chr : value)
+    {
+        if (inEscapeSeq)
+        {
+            // ++it; // Next char
+            if (chr == 's') result.append(' ');  // Space
+            else if (chr == 'n') result.append('\n');  // New line
+            else if (chr == 'r') result.append('\r');  // CR
+            else if (chr == 't') result.append('\t');  // Tab
+            else if (chr == '\\') result.append('\\');  // Backslash
+            inEscapeSeq = false;
+        } else if (chr == '\\') inEscapeSeq = true; // Backslash, start escape sequence
+        else result.append(chr);
+    }
+    return result;
+}
+
+bool Application::testFile()
+{
+    /*
+    if (this->tryexec().isEmpty()) return true; // TryExec property missing, assume the file exists
+    QStringList pathList = QString(getenv("PATH")).split(":"); // Get PATH from environment
+    for (const auto& path : qAsConst(pathList)) // Loop over paths from PATH
+        if (QFile::exists(QString(path).append("/").append(tryexec()))) return true; // If found return true
+    */
+    return false; // Fallthrough: TryExec was set but file not found on PATH
 }
