@@ -15,7 +15,9 @@
 int main(int argc, char *argv[])
 {
     QLoggingCategory::setFilterRules("qt.svg.warning=false"); // Hide buggy SVG icon warnings
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
     QCoreApplication::setApplicationName("qdmenu");
     QCoreApplication::setOrganizationName("bayi");
     QCoreApplication::setOrganizationDomain("bayi.hu");

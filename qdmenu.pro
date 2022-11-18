@@ -1,7 +1,8 @@
 TEMPLATE = app
 
-QT += qml quick svg
+QT += quick
 CONFIG += c++11
+#CONFIG += console
 
 SOURCES += main.cpp \
     applicationfinder.cpp \
