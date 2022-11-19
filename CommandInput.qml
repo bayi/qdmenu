@@ -64,7 +64,7 @@ Item
             if (event.key === Qt.Key_Up) { event.accepted = true; moveUp();}
             if (event.key === Qt.Key_Home) moveHome();
             if (event.key === Qt.Key_End) moveEnd();
-            if (event.key === Qt.Key_Shift) { toggleNoDisplay(); }
+            if (event.key === Qt.Key_Control) { toggleNoDisplay(); }
         }
 
         Text {
