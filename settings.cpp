@@ -27,6 +27,12 @@ bool Settings::getBool(const QString &key, const QVariant &def)
 
 void Settings::initDefaults()
 {
+    checkAndSet("base/ignored_applications_regex", "(compton|picom|x11vnc|electron|openjdk|lstop|mpv|stoken-gui|cmake-gui|qvidcap|qv4l2|avahi-discover|bssh|bvnc)");
+    checkAndSet("base/terminal", "i3-sensible-terminal");
+    checkAndSet("base/show_terminal_apps", false);
+    checkAndSet("base/default_icon", "application-x-executable");
+    checkAndSet("base/binary_icon", "application-x-executable");
+
     checkAndSet("background/bgcolor", "#000000");
     checkAndSet("background/topmargin", 32);
 

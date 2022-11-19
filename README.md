@@ -35,23 +35,22 @@ other tiling window manager. There is a PKGBUILD package submitted to AUR (https
 
 # Contribution
 This is my first public project on github, i know the code lacks comments but i think its readable.
-There are some codeing guidelines which i tried to follow in this project, the most important ares:
+There are some coding guidelines which i tried to follow in this project, the most important ares:
  - 80 column width
  - 4 spaces and no tabs
 But theese arent mandatory either, if you contribute please try to keep your code readable and if something
 is not clear then put a comment on it, thnx ;)
 
 # TODO
- - Config file in ~/.local/config/qdmenu/config, with config options:
-    - Icon / Grid item size
-    - Background color, text color, text background
-    - Custom unknown icon
-    - Custom binary icon
-    - display NoDisplay entries true/false
-    - display plain binaries by default true/false
+ * Config file in ~/.local/config/qdmenu/config, with config options:
+    + Icon / Grid item size
+    + Background color, text color, text background
+    + Custom unknown icon
+    + Custom binary icon
+    + display NoDisplay entries true/false
+    + display plain binaries by default true/false
     - modifier keys remap
 
 - Add modifier key for sudo/gksu/kdesu starting
-- Raw binary listing
 - Add modifier key for switching *.desktop file listing mode ( currently implemented ) and raw binary listing mode
 

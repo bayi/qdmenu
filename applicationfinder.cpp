@@ -3,26 +3,27 @@
 
 void ApplicationFinder::work()
 {
-    this->m_files.append(this->readFolder(QDir::homePath() + APPLICATIONS_LOCAL_PATH));
-    this->m_files.append(this->readFolder(APPLICATIONS_PATH));
-    foreach(QString file, this->m_files)
+    QStringList appdirs = QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation); // XDG Default applications location, user local folder first
+    appdirs.append(QStandardPaths::standardLocations(QStandardPaths::DesktopLocation)); // Add Desktop to search path
+    QStringList loadedFiles;
+    static QRegularExpression removeKey("^.*applications/");
+    for(const auto& appdir : qAsConst(appdirs))
     {
-        Application* app = new Application(file);
-        // qDebug() << "Found application: " << app->name();
-        emit appFound(app);
+        QDirIterator appdirIterator(appdir, QStringList(APPLICATIONS_FILES_GLOB), QDir::Files, QDirIterator::Subdirectories|QDirIterator::FollowSymlinks);
+        while(!appdirIterator.next().isEmpty())
+        {
+            QString fileKey = appdirIterator.filePath().remove(removeKey);
+            if (!loadedFiles.contains(fileKey)) {
+                Application* app = new Application(appdirIterator.filePath());
+                if (app->parse()) {
+                    // qDebug() << "App Found: " << app->name();
+                    emit appFound(app);
+                    loadedFiles.append(fileKey);
+                } else delete app;
+            }
+        }
     }
-    this->m_files.clear();
-}
-
-QStringList ApplicationFinder::readFolder(QString folder)
-{
-    QDir dir(folder);
-    QFileInfoList file_list = dir.entryInfoList(QStringList(APPLICATIONS_FILES), QDir::Files | QDir::Readable);
-    QStringList files;
-    foreach(QFileInfo file, file_list)
-        if (this->m_files.filter(file.fileName()).count() == 0)
-            files.append(file.absoluteFilePath());
-    return files;
+    appdirs.clear();
 }
 
 ApplicationFinder::ApplicationFinder(QObject *parent) :
@@ -33,7 +34,6 @@ ApplicationFinder::~ApplicationFinder()
 {
     if (m_thread.isRunning())
         m_thread.cancel();
-    m_files.clear();
 }
 
 void ApplicationFinder::run()

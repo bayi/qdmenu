@@ -2,14 +2,14 @@
 #define ICONPROVIDER_H
 
 #include <QQuickImageProvider>
+#include "settings.h"
 
-#define ICONPROVIDER_UNKNOWN_ICON       "://icons/unknown.svg"
+#define ICONPROVIDER_UNKNOWN_ICON       "application-x-executable"
+#define ICONPROVIDER_ICONS_PATH         "icons"
+#define ICONPROVIDER_HOME_ICONS_PATH   ".icons"
 #define ICONPROVIDER_PIXMAPS_PATH       "/usr/share/pixmaps/"
 #define ICONPROVIDER_LOCAL_ICONS_PATH   "/.local/share/icons"
-#define ICONPROVIDER_DEFAULT_SIZE       80,80
-#define ICONPROVIDER_EXTENSION_SEARCH   "\\.(?:png|xpm|svg)$"
 #define ICONPROVIDER_LOOKUP_THEMES      "gnome" <<  "HighContrast"
-#define ICONPROVIDER_LOOKUP_EXTS        ".png" << ".xpm" << ".svg"
 
 /**
  * @brief The IconProvider class
@@ -18,14 +18,15 @@
  */
 class IconProvider : public QQuickImageProvider
 {
-
-    QString m_originalThemeName;
+    Settings* m_settings;
+    QString m_themeName;
     QStringList m_themeList;
+    QStringList m_iconExtensions = {"png", "svg", "xpm"};
+    QStringList m_iconDirs;
 
-    QPixmap searchThemeIcon(QString search);
-    QString searchPixmapPath(QString search);
-
-    QPixmap checkIconPath(const QString &path);
+    QPixmap defaultIcon() const;
+    QPixmap searchIcon(QString search) const;
+    QString lookupIconExtension(QString icon) const;
 
 public:
     explicit IconProvider();

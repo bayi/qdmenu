@@ -2,17 +2,6 @@
 #include <QDir>
 #include <qdebug.h>
 
-const int ApplicationList::SearchRole = Qt::UserRole + 1;
-const int ApplicationList::NameRole = Qt::UserRole + 2;
-const int ApplicationList::NameLocalizedRole = Qt::UserRole + 3;
-const int ApplicationList::GenericNameRole = Qt::UserRole + 4;
-const int ApplicationList::GenericNameLocalizedRole = Qt::UserRole + 5;
-const int ApplicationList::CommentRole = Qt::UserRole + 6;
-const int ApplicationList::IsHiddenRole = Qt::UserRole + 7;
-const int ApplicationList::IconRole = Qt::UserRole + 8;
-const int ApplicationList::ExecRole = Qt::UserRole + 9;
-const int ApplicationList::TerminalRole = Qt::UserRole + 10;
-
 ApplicationList::ApplicationList(QObject *parent) :
     QAbstractListModel(parent)
 {
@@ -31,6 +20,11 @@ int ApplicationList::count() const
     return m_data.count();
 }
 
+QObject* ApplicationList::get(int index)
+{
+    return m_data.at(index);
+}
+
 int ApplicationList::rowCount(const QModelIndex &) const
 {
     return count();
@@ -46,64 +40,42 @@ QVariant ApplicationList::data(const QModelIndex &index, int role) const
     Application* obj = m_data.at(index.row());
     switch(role)
     {
+        case Qt::DisplayRole:
+            return QVariant::fromValue(obj->nameLocalized());
         case SearchRole:
             return QVariant::fromValue(obj->searchTerms().join(" "));
-
-        case NameRole:
-            return QVariant::fromValue(obj->name());
-
-        case Qt::DisplayRole:
-        case NameLocalizedRole:
-            return QVariant::fromValue(obj->nameLocalized());
-
-        case GenericNameRole:
-            return QVariant::fromValue(obj->genericName());
-
-        case GenericNameLocalizedRole:
-            return QVariant::fromValue(obj->genericNameLocalized());
-
-        case CommentRole:
-            return QVariant::fromValue(obj->comment());
-
-        case IsHiddenRole:
-            return QVariant::fromValue(obj->isHidden());
-
         case IconRole:
             return QVariant::fromValue(obj->icon());
-
-        case ExecRole:
-            return QVariant::fromValue(obj->exec());
-
-        case TerminalRole:
-            return QVariant::fromValue(obj->terminal());
-
+        case CommentRole:
+            return QVariant::fromValue(obj->comment());
+        case IsTerminalRole:
+            return QVariant::fromValue(obj->isTerminal());
+        case IsHiddenRole:
+            return QVariant::fromValue(obj->isHidden());
+        case IsNoDisplayRole:
+            return QVariant::fromValue(obj->isNoDisplay());
         default:
-            return QVariant::fromValue(obj->nameLocalized());
+            return QVariant();
     }
 }
 
 QHash<int, QByteArray> ApplicationList::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
-    roles.insert(SearchRole, QByteArray("search"));
-    roles.insert(NameRole, QByteArray("name"));
-    roles.insert(NameLocalizedRole, QByteArray("name_localized"));
-    roles.insert(GenericNameRole, QByteArray("generic_name"));
-    roles.insert(GenericNameLocalizedRole, QByteArray("generic_name_localized"));
-    roles.insert(CommentRole, QByteArray("comment"));
-    roles.insert(IsHiddenRole, QByteArray("is_hidden"));
     roles.insert(IconRole, QByteArray("icon"));
-    roles.insert(ExecRole, QByteArray("exec"));
-    roles.insert(TerminalRole, QByteArray("terminal"));
+    roles.insert(SearchRole, QByteArray("search"));
+    roles.insert(CommentRole, QByteArray("comment"));
+    roles.insert(IsTerminalRole, QByteArray("isTerminal"));
+    roles.insert(IsHiddenRole, QByteArray("isHidden"));
+    roles.insert(IsNoDisplayRole, QByteArray("isNoDisplay"));
     return roles;
 }
 
 void ApplicationList::append(Application *item)
 {
-    // @TODO: Setting/Key for showing hidden items
-    if (!item->noDisplay() && !item->terminal() && !item->isHidden())
+    // qDebug() << "Adding app:" << item->name();
+    if (!item->isHidden())
     {
-        // qDebug() << "Adding app:" << item->name();
         beginInsertRows(QModelIndex(), m_data.count(), m_data.count());
         m_data.append(item);
         endInsertRows();

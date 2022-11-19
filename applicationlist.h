@@ -22,21 +22,19 @@ class ApplicationList : public QAbstractListModel
     QList<Application*> m_data;
 
 public:
+    enum Roles {
+        IconRole = Qt::UserRole + 1,
+        SearchRole,
+        CommentRole,
+        IsTerminalRole,
+        IsHiddenRole,
+        IsNoDisplayRole
+    };
     explicit ApplicationList(QObject *parent = 0);
     virtual ~ApplicationList();
 
-    static const int SearchRole;
-    static const int NameRole;
-    static const int NameLocalizedRole;
-    static const int GenericNameRole;
-    static const int GenericNameLocalizedRole;
-    static const int CommentRole;
-    static const int IsHiddenRole;
-    static const int IconRole;
-    static const int ExecRole;
-    static const int TerminalRole;
-
     int count() const;
+    Q_INVOKABLE QObject* get(int index);
 
     // QAbstractItemModel interface
     virtual int rowCount(const QModelIndex & = QModelIndex()) const;

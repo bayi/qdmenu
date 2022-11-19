@@ -4,8 +4,6 @@
         <file>AppList.qml</file>
         <file>CommandInput.qml</file>
     </qresource>
-    <qresource prefix="/icons">
-        <file>unknown.svg</file>
-    </qresource>
+    <qresource prefix="/icons"/>
     <qresource prefix="/styles"/>
 </RCC>

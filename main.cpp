@@ -5,13 +5,8 @@
 #include "applicationlist.h"
 #include "applicationfilter.h"
 #include "iconprovider.h"
-#include "process.h"
 #include "settings.h"
 
-/**
- * @todo: SHIFT(ENTER) for sudo
- * @todo: TAB For command (term /{usr}/bin/) / app (.desktop) mode
- */
 int main(int argc, char *argv[])
 {
     QLoggingCategory::setFilterRules("qt.svg.warning=false"); // Hide buggy SVG icon warnings
@@ -32,9 +27,8 @@ int main(int argc, char *argv[])
 
     apps->setSourceModel(applications);
     apps->sort(0, Qt::AscendingOrder);
-    apps->setDynamicSortFilter(false);
+    apps->setDynamicSortFilter(true);
 
-    qmlRegisterType<Process>("Process", 1, 0, "Process");
     context->setContextProperty("settings", settings);
     context->setContextProperty("apps", apps);
 

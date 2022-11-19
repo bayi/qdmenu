@@ -1,130 +1,109 @@
 #include "application.h"
+#include <QCoreApplication>
 #include <QFile>
-#include <QSettings>
-#include <qdebug.h>
-
-bool readDesktopFile(QIODevice &device, QSettings::SettingsMap &map)
-{
-    QTextStream stream(&device);
-    QString currentSection;
-    bool isValid = false;
-    for (QString line = stream.readLine(); !line.isNull(); line=stream.readLine())
-    {
-        line = line.trimmed();
-        if (line.isEmpty() && line.startsWith(QLatin1Char('#'))) continue; // If line is empty or is a comment skip it
-        if (line.startsWith(QLatin1Char('['))) { // Section start
-            currentSection = line.mid(1, line.size() - 2).trimmed();
-            if (currentSection == "Desktop Entry") isValid = true;
-            continue;
-        }
-        if (currentSection.isEmpty() || currentSection != "Desktop Entry") continue; // If not in 'Desktop Entry' section yet .. continue
-        QString key = line.section('=', 0,0).trimmed(); // Key is the part before the first =
-        QString value = line.section('=', 1, -1).trimmed(); // Value is the part after the first =
-        if (value.contains(QLatin1Char(';')))
-            map.insert(key, value.split(QLatin1Char(';'), Qt::SplitBehaviorFlags::SkipEmptyParts)); // If the value contains ; then its an array so split it
-        else
-            map.insert(key, value);
-
-    }
-    return isValid;
-}
-
-bool writeDesktopFile(QIODevice &device, const QSettings::SettingsMap &map)
-{
-    Q_UNUSED(device);
-    Q_UNUSED(map);
-    qInfo() << "Only reading of desktop files in supported!";
-    return true;
-}
-
-// Ignore non-pdo-global-static
-const QSettings::Format DesktopFileFormat = QSettings::registerFormat("desktopfile", readDesktopFile, writeDesktopFile);
+#include <QProcess>
+#include <QDebug>
+#include "desktopfileformat.h"
 
 Application::Application(QString fileName, QObject* parent):
     QObject(parent), m_fileName(fileName)
 {
-    m_search_terms = QStringList();
-    this->m_shouldHide = QRegExp(DESKTOP_SHOULD_HIDE_REGEXP);
-    this->parse();
+    m_settings = new Settings();
 }
 
 bool Application::parse()
 {
-    m_search_terms.clear();
+    static const QSettings::Format DesktopFileFormat = QSettings::registerFormat("desktopfile", desktopFileRead, desktopFileWrite);
+
+    QStringList currentDesktop = QString(getenv("XDG_CURRENT_DESKTOP")).split(QLatin1Char(':'),
+    Qt::SplitBehaviorFlags::SkipEmptyParts);
     QString locale = QLocale::system().name().split(QRegExp("_")).at(0);
-    QSettings settings(m_fileName, QSettings::IniFormat);
+
+    QSettings settings(fileName(), DesktopFileFormat);
+    QRegExp ignoredApps = QRegExp(m_settings->get("base/ignored_applications_regex", IGNORED_APPS_REGEXP).toString());
     settings.setIniCodec("UTF-8");
-    settings.beginGroup(DESKTOP_GROUP_ENTRY_NAME);
-    this->setVersion(settings.value(DESKTOP_KEY_VERSION).toString());
-    this->setTerminal(settings.value(DESKTOP_KEY_TERMINAL).toBool());
-    this->setCategories(settings.value(DESKTOP_KEY_CATEGORIES).toStringList());
-    this->setType(settings.value(DESKTOP_KEY_TYPE).toString());
-    this->setIcon(QString("image://appicon/%1").arg(settings.value(DESKTOP_KEY_ICON).toString()));
-    this->setExec(settings.value(DESKTOP_KEY_EXEC).toString());
-    this->setComment(settings.value(DESKTOP_KEY_COMMENT).toString());
-    this->setIsHidden(this->m_shouldHide.indexIn(this->exec()) != -1);
-    this->setName(settings.value(DESKTOP_KEY_NAME).toString());
-    this->setNameLocalized(settings.value(QString(DESKTOP_KEY_LOCALE_NAME).arg(locale)).toString());
-    if (nameLocalized().isEmpty())
-        this->setNameLocalized(name());
-    QString genericName = settings.value(QString(DESKTOP_KEY_LOCALE_GENERIC_NAME).arg(locale)).toString();
-    if (genericName.isEmpty())
-        this->setGenericName(settings.value(DESKTOP_KEY_GENERIC_NAME).toString());
-    else
-        this->setGenericName(genericName);
-    this->setNoDisplay(settings.value(DESKTOP_KEY_NODISPLAY).toBool());
-    m_search_terms.append(name());
-    m_search_terms.append(nameLocalized());
-    m_search_terms.append(this->genericName());
-    m_search_terms.append(genericNameLocalized());
-    m_search_terms.append(comment());
-    m_search_terms.append(exec());
+
+    // According to the spec 'Hidden' is used for "Uninstalling" apps, so if its set and true then we mark it as inValid
+    if (settings.value(DESKTOP_KEY_HIDDEN).toBool()) return false;
+
+    // If TryExec is set and doesnt exists also mark as invalid
+    this->setTryExec(escapeValue(settings.value(DESKTOP_KEY_TRY_EXEC).toString()));
+    if (!testFile()) return false;
+
+    // If NotShowIn is set and our DM is in that list then set this file as hidden
+    QStringList list = settings.value(DESKTOP_KEY_NOT_SHOW_IN).toStringList();
+    for (const auto& str : qAsConst(list))
+        if (currentDesktop.contains(str)) setIsHidden(true);
+
+    // If OnlyShowIn is set and our DM is NOT in that list then set this file as hidden
+    QStringList onlyShowIn = settings.value(DESKTOP_KEY_ONLY_SHOWN_IN).toStringList();
+    if (onlyShowIn.length() > 0) {
+        bool found = false;
+        for (const auto& str : qAsConst(onlyShowIn))
+            if (currentDesktop.contains(str)) found = true;
+        setIsHidden(isHidden() || !found);
+    }
+
+    // Parse rest of attributes
+    setName(escapeValue(settings.value(DESKTOP_KEY_NAME).toString()));
+    setNameLocalized(escapeValue(getLocalizedValue(settings, locale, DESKTOP_KEY_NAME).toString()));
+    setGenericName(escapeValue(settings.value(DESKTOP_KEY_GENERIC_NAME).toString()));
+    setGenericNameLocalized(escapeValue(getLocalizedValue(settings, locale, DESKTOP_KEY_GENERIC_NAME).toString()));
+    setComment(escapeValue(getLocalizedValue(settings, locale, DESKTOP_KEY_COMMENT).toString()));
+    setKeywords(getLocalizedValue(settings, locale, DESKTOP_KEY_KEYWORDS).toString());
+    setExec(escapeValue(settings.value(DESKTOP_KEY_EXEC).toString()));
+    setPath(escapeValue(settings.value(DESKTOP_KEY_PATH).toString()));
+    setIcon(QString("image://appicon/%1").arg(getLocalizedValue(settings, locale, DESKTOP_KEY_ICON).toString()));
+    setType(settings.value(DESKTOP_KEY_TYPE).toString());
+    setVersion(settings.value(DESKTOP_KEY_VERSION).toString());
+    setCategories(getLocalizedValue(settings, locale, DESKTOP_KEY_CATEGORIES).toStringList());
+    setIsTerminal(settings.value(DESKTOP_KEY_TERMINAL).toBool());
+    // Force set NoDisplay if its in our ignore list
+    setIsNoDisplay(settings.value(DESKTOP_KEY_NO_DISPLAY).toBool() || (ignoredApps.indexIn(exec()) != -1));
+
+    // Precalculate search string for filtering
+    m_searchTerms.clear();
+    m_searchTerms.append(name());
+    m_searchTerms.append(nameLocalized());
+    m_searchTerms.append(genericName());
+    m_searchTerms.append(genericNameLocalized());
+    m_searchTerms.append(comment());
+    m_searchTerms.append(keywords());
+    m_searchTerms.append(exec());
+    emit searchTermsChanged(m_searchTerms);
+
     return true;
 }
 
-bool Application::run()
+bool Application::run(QString input)
 {
+    // @TODO: Also parse Action, expand field Codes, use Path, fix terminal helper (Partially done)
+    // @TODO: Modifier to run with sudo
+    // @TODO: Calculator, binaries from (/{usr}/bin), urls ( with protocols ) etc, separate non app launcher
+    qDebug() << "Executing: " << exec() << " With Input: " << input;
 
+    // Strip field codes from Exec= line
+    QString stripped = exec().remove(QRegExp("%[a-zA-Z]")).trimmed();
+    QStringList args = QProcess::splitCommand(stripped);
+    QString command = args.takeFirst();
+    if (isTerminal())
+    {
+        qDebug() << "Starting terminal process: " << command << " args: " << args.join(',');
+        Settings* settings = new Settings();
+        QProcess::startDetached(settings->get("base/terminal", "i3-sensible-terminal").toString(), QStringList() << "-e" << command << args);
+    } else {
+        qDebug() << "Starting process: " << command << " args: " << args.join(',');
+        QProcess::startDetached(command, args);
+    }
+
+    // Bye bye...
+    QCoreApplication::quit();
+    return true; // Just to make the compiler happy ...
 }
 
 QString Application::fileName() const
 {
     return m_fileName;
-}
-
-QString Application::version() const
-{
-    return m_version;
-}
-
-bool Application::terminal() const
-{
-    return m_terminal;
-}
-
-QStringList Application::categories() const
-{
-    return m_categories;
-}
-
-QString Application::type() const
-{
-    return m_type;
-}
-
-QString Application::icon() const
-{
-    return m_icon;
-}
-
-QString Application::exec() const
-{
-    return m_exec;
-}
-
-QString Application::comment() const
-{
-    return m_comment;
 }
 
 QString Application::name() const
@@ -134,37 +113,82 @@ QString Application::name() const
 
 QString Application::nameLocalized() const
 {
-    return m_name_localized;
+    return m_nameLocalized;
 }
 
 QString Application::genericName() const
 {
-    return m_generic_name;
+    return m_genericName;
 }
 
 QString Application::genericNameLocalized() const
 {
-    return m_generic_name_localized;
+    return m_genericNameLocalized;
+}
+
+QString Application::comment() const
+{
+    return m_comment;
+}
+
+QString Application::keywords() const
+{
+    return m_keywords;
+}
+
+QString Application::exec() const
+{
+    return m_exec;
+}
+
+QString Application::tryExec() const
+{
+    return m_tryExec;
+}
+
+QString Application::path() const
+{
+    return m_path;
+}
+
+QString Application::icon() const
+{
+    return m_icon;
+}
+
+QString Application::type() const
+{
+    return m_type;
+}
+
+QString Application::version() const
+{
+    return m_version;
+}
+
+QStringList Application::categories() const
+{
+    return m_categories;
 }
 
 QStringList Application::searchTerms() const
 {
-    return m_search_terms;
+    return m_searchTerms;
 }
 
-bool Application::noDisplay() const
+bool Application::isTerminal() const
 {
-    return m_noDisplay;
+    return m_isTerminal;
+}
+
+bool Application::isNoDisplay() const
+{
+    return m_isNoDisplay;
 }
 
 bool Application::isHidden() const
 {
-    return m_hidden;
-}
-
-bool Application::isValid() const
-{
-    return m_is_valid;
+    return m_isHidden;
 }
 
 void Application::setFileName(QString fileName)
@@ -173,69 +197,6 @@ void Application::setFileName(QString fileName)
         return;
     m_fileName = fileName;
     emit fileNameChanged(fileName);
-}
-
-void Application::setVersion(QString version)
-{
-    if (m_version == version)
-        return;
-
-    m_version = version;
-    emit versionChanged(version);
-}
-
-void Application::setTerminal(bool terminal)
-{
-    if (m_terminal == terminal)
-        return;
-
-    m_terminal = terminal;
-    emit terminalChanged(terminal);
-}
-
-void Application::setCategories(QStringList categories)
-{
-    if (m_categories == categories)
-        return;
-
-    m_categories = categories;
-    emit categoriesChanged(categories);
-}
-
-void Application::setType(QString type)
-{
-    if (m_type == type)
-        return;
-
-    m_type = type;
-    emit typeChanged(type);
-}
-
-void Application::setIcon(QString icon)
-{
-    if (m_icon == icon)
-        return;
-
-    m_icon = icon;
-    emit iconChanged(icon);
-}
-
-void Application::setExec(QString exec)
-{
-    if (m_exec == exec)
-        return;
-
-    m_exec = exec;
-    emit execChanged(exec);
-}
-
-void Application::setComment(QString comment)
-{
-    if (m_comment == comment)
-        return;
-
-    m_comment = comment;
-    emit commentChanged(comment);
 }
 
 void Application::setName(QString name)
@@ -247,50 +208,147 @@ void Application::setName(QString name)
     emit nameChanged(name);
 }
 
-void Application::setNameLocalized(QString name)
+void Application::setNameLocalized(QString nameLocalized)
 {
-    if (m_name_localized == name)
+    if (m_nameLocalized == nameLocalized)
         return;
 
-    m_name_localized = name;
-    emit nameLocalizedChanged(name);
+    m_nameLocalized = nameLocalized;
+    emit nameLocalizedChanged(nameLocalized);
 }
 
-void Application::setGenericName(QString name)
+void Application::setGenericName(QString genericName)
 {
-    if (m_generic_name == name)
+    if (m_genericName == genericName)
         return;
 
-    m_generic_name = name;
-    emit genericNameChanged(name);
+    m_genericName = genericName;
+    emit genericNameChanged(genericName);
 }
 
-void Application::setGenericNameLocalized(QString name)
+void Application::setGenericNameLocalized(QString geneircNameLocalized)
 {
-    if (m_generic_name_localized == name)
+    if (m_genericNameLocalized == geneircNameLocalized)
         return;
 
-    m_generic_name_localized = name;
-    emit genericNameLocalizedChanged(name);
+    m_genericNameLocalized = geneircNameLocalized;
+    emit genericNameLocalizedChanged(geneircNameLocalized);
 }
 
-void Application::setNoDisplay(bool noDisplay)
+
+void Application::setComment(QString comment)
 {
-    if (m_noDisplay == noDisplay)
+    if (m_comment == comment)
         return;
 
-    m_noDisplay = noDisplay;
-    emit noDisplayChanged(noDisplay);
+    m_comment = comment;
+    emit commentChanged(comment);
+}
+
+void Application::setKeywords(QString keywords)
+{
+    if (m_keywords == keywords)
+        return;
+
+    m_keywords = keywords;
+    emit keywordsChanged(keywords);
+}
+
+void Application::setExec(QString exec)
+{
+    if (m_exec == exec)
+        return;
+
+    m_exec = exec;
+    emit execChanged(exec);
+}
+
+void Application::setTryExec(QString tryExec)
+{
+    if (m_tryExec == tryExec)
+        return;
+
+    m_tryExec = tryExec;
+    emit tryExecChanged(tryExec);
+}
+
+void Application::setPath(QString path)
+{
+    if (m_path == path)
+        return;
+    m_path = path;
+    emit pathChanged(path);
+}
+
+void Application::setIcon(QString icon)
+{
+    if (m_icon == icon)
+        return;
+
+    m_icon = icon;
+    emit iconChanged(icon);
+}
+
+void Application::setType(QString type)
+{
+    if (m_type == type)
+        return;
+
+    m_type = type;
+    emit typeChanged(type);
+}
+
+void Application::setVersion(QString version)
+{
+    if (m_version == version)
+        return;
+
+    m_version = version;
+    emit versionChanged(version);
+}
+
+void Application::setCategories(QStringList categories)
+{
+    if (m_categories == categories)
+        return;
+
+    m_categories = categories;
+    emit categoriesChanged(categories);
+}
+
+void Application::setSearchTerms(QStringList searchTerms)
+{
+    if (m_searchTerms == searchTerms)
+        return;
+    m_searchTerms = searchTerms;
+    emit searchTermsChanged(searchTerms);
+}
+
+void Application::setIsTerminal(bool isTerminal)
+{
+    if (m_isTerminal == isTerminal)
+        return;
+
+    m_isTerminal = isTerminal;
+    emit isTerminalChanged(isTerminal);
+}
+
+void Application::setIsNoDisplay(bool isNoDisplay)
+{
+    if (m_isNoDisplay == isNoDisplay)
+        return;
+
+    m_isNoDisplay = isNoDisplay;
+    emit isNoDisplayChanged(isNoDisplay);
 }
 
 void Application::setIsHidden(bool isHidden)
 {
-    m_hidden = isHidden;
-}
+    if (m_isHidden == isHidden)
+        return;
 
-void Application::setIsValid(bool isValid)
-{
-    m_is_valid = isValid;
+    m_isHidden = isHidden;
+    emit isHiddenChanged(isHidden);
 }
 
 QVariant Application::getLocalizedValue(QSettings &settings, QString locale, QString key)
@@ -325,11 +383,9 @@ QString Application::escapeValue(QString value)
 
 bool Application::testFile()
 {
-    /*
-    if (this->tryexec().isEmpty()) return true; // TryExec property missing, assume the file exists
+    if (tryExec().isEmpty()) return true; // TryExec property missing, assume the file exists
     QStringList pathList = QString(getenv("PATH")).split(":"); // Get PATH from environment
     for (const auto& path : qAsConst(pathList)) // Loop over paths from PATH
-        if (QFile::exists(QString(path).append("/").append(tryexec()))) return true; // If found return true
-    */
+        if (QFile::exists(QString(path).append("/").append(tryExec()))) return true; // If found return true
     return false; // Fallthrough: TryExec was set but file not found on PATH
 }

@@ -5,7 +5,7 @@ Item
 {
     signal itemSelected(variant app)
 
-    function current() { return list.currentItem != null ? list.currentItem.item : null}
+    function current() { return apps.get(list.model.index(list.currentIndex, 0)); }
     function up() { list.moveCurrentIndexUp() }
     function down() { list.moveCurrentIndexDown() }
     function left() { list.moveCurrentIndexLeft() }
@@ -13,6 +13,7 @@ Item
     function home() { list.currentIndex = 0 }
     function end() { list.currentIndex = list.count - 1 }
     function filter(text) { apps.setFilterName(text) }
+    function toggleNoDisplay() { apps.toggleFilterShowNoDisplay() }
 
     property int itemWidth: list.cellWidth - (list.padding / 2)
     property int itemHeight: list.cellHeight - (list.padding / 2)
@@ -114,7 +115,7 @@ Item
                 Label
                 {
                     id: label
-                    text: model.name_localized
+                    text: model.display
                     color: settings.get("icons/textcolor", "#ffffff")
                     width: parent.width
                     wrapMode:  Text.WrapAtWordBoundaryOrAnywhere

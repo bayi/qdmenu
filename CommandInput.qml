@@ -10,6 +10,7 @@ Item
     signal moveRight()
     signal moveHome()
     signal moveEnd()
+    signal toggleNoDisplay()
 
     property string placeholderText: qsTr("Enter application/command/name")
 
@@ -63,6 +64,7 @@ Item
             if (event.key === Qt.Key_Up) { event.accepted = true; moveUp();}
             if (event.key === Qt.Key_Home) moveHome();
             if (event.key === Qt.Key_End) moveEnd();
+            if (event.key === Qt.Key_Shift) { toggleNoDisplay(); }
         }
 
         Text {

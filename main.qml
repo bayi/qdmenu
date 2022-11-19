@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Layouts 1.12
-import Process 1.0
 
 Window
 {
@@ -15,14 +14,17 @@ Window
     flags: Qt.FramelessWindowHint | Qt.WA_TranslucentBackground | Qt.WindowStaysOnTopHint
     opacity: 0
 
+    function executeApp(input) {
+        const app = applist.current()
+        if (app) app.run(input)
+    }
+
     onActiveChanged: {
         if (!active) {
             // console.log('Lost focus, exiting.')
             // Qt.quit()
         }
     }
-
-    Process { id: process }
 
     NumberAnimation on opacity {
         from: 0
@@ -45,13 +47,7 @@ Window
             Layout.alignment: Qt.AlignCenter
             Layout.preferredWidth: parent.width / 4
             Layout.preferredHeight: settings.getNumber("input/height", 32)
-            onItemSelected:
-            {
-                if (applist.current() === null)
-                    process.start(text, true)
-                else
-                    process.start(applist.current().exec, applist.current().terminal)
-            }
+            onItemSelected: executeApp(text)
             onMoveUp: applist.up()
             onMoveDown: applist.down()
             onMoveLeft: applist.left()
@@ -59,6 +55,7 @@ Window
             onMoveHome: applist.home()
             onMoveEnd: applist.end()
             onSearchChanged: applist.filter(text)
+            onToggleNoDisplay: applist.toggleNoDisplay()
         }
 
         AppList
@@ -67,8 +64,7 @@ Window
             Layout.preferredWidth: parent.width
             Layout.fillWidth: true
             Layout.fillHeight: true
-            onItemSelected: process.start(app.exec, app.terminal)
+            onItemSelected: executeApp("")
         }
-
     }
 }

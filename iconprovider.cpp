@@ -2,87 +2,39 @@
 #include <QIcon>
 #include <QDir>
 #include <QFileInfo>
-#include <qdebug.h>
+#include <QStandardPaths>
+#include <QDebug>
 
 IconProvider::IconProvider() :
     QQuickImageProvider(QQuickImageProvider::Pixmap)
 {
-    // Store original theme in property
-    m_originalThemeName = QIcon::themeName();
-    m_themeList << m_originalThemeName << ICONPROVIDER_LOOKUP_THEMES;
-    // Add home directory icons
-    QString localFolder = QDir::homePath() + ICONPROVIDER_LOCAL_ICONS_PATH;
-    QStringList paths = QIcon::themeSearchPaths();
-    paths.append(localFolder);
-    QIcon::setThemeSearchPaths(paths);
-}
+    m_settings = new Settings();
+    // First directory $HOME/icons
+    QString path = QDir::home().filePath(ICONPROVIDER_HOME_ICONS_PATH);
+    if (QFile::exists(path))
+        m_iconDirs.append(path);
 
+    // Add XDG_DATA_DIRS/icons to paths
+    QStringList xdgPaths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    for (const auto &dir : qAsConst(xdgPaths))
+        if (QFile::exists(path = QDir(dir).filePath(ICONPROVIDER_ICONS_PATH)))
+            m_iconDirs.append(path);
 
-QPixmap IconProvider::searchThemeIcon(QString search)
-{
-    // qDebug() << "Searching theme icon: " << search;
-    // Remove extension
-    // ( for ex.: java apps have icons specified as sun-jcontrol-jdk8.png )
-    if (search.contains(QRegExp(ICONPROVIDER_EXTENSION_SEARCH)))
-    {
-        search = search.left(search.length() - 4);
-    }
+    // /usr/share/pixmaps last
+    path = QDir::home().filePath(ICONPROVIDER_LOCAL_ICONS_PATH);
+    if (QFile::exists(path))
+        m_iconDirs.append(path);
+    path = ICONPROVIDER_PIXMAPS_PATH;
+    if (QFile::exists(path))
+        m_iconDirs.append(path);
 
-    // Lookup in themes, beginning with the original theme
-    for(int i = 0; i < m_themeList.size(); ++i)
-    {
-        // qDebug() << "Searching in theme: " << m_themeList.at(i);
-        QIcon::setThemeName(m_themeList.at(i));
-        if (QIcon::hasThemeIcon(search))
-        {
-            return QIcon::fromTheme(search).pixmap(QSize(ICONPROVIDER_DEFAULT_SIZE));
-        }
-    }
+    // Store original theme and add other themes to search icons for
+    m_themeName = QIcon::themeName();
+    m_themeList << QIcon::themeName() << ICONPROVIDER_LOOKUP_THEMES;
+    m_themeList.removeDuplicates();
+    m_iconDirs.removeDuplicates();
 
-    return QPixmap();
-}
-
-QString IconProvider::searchPixmapPath(QString search)
-{
-    // Try to look it up in the /user/share/pixmaps folder directly
-    QFileInfo check(ICONPROVIDER_PIXMAPS_PATH + search);
-    if (check.exists())
-    {
-        return QString(ICONPROVIDER_PIXMAPS_PATH + search);
-    }
-
-    // If the search string doesnt have an extension look it up with supported
-    // extensions applied or if the searchstring has an extension remove it
-    QString noExt = search;
-    if (search.contains(QRegExp(ICONPROVIDER_EXTENSION_SEARCH)))
-    {
-        // if the searchstring does have an extension remove it
-        // ( for ex.: teamspeak3 has teamspeak3.xpm in its
-        // .desktop file but the icon is named teamspeak3.png )
-        noExt = search.left(search.length() - 4);
-    }
-
-    // Check with other known extensions in the folder
-    QStringList lookupExtensions;
-    lookupExtensions << ICONPROVIDER_LOOKUP_EXTS;
-    for(int i = 0; i < lookupExtensions.size(); ++i)
-    {
-        check.setFile(ICONPROVIDER_PIXMAPS_PATH + noExt + lookupExtensions.at(i));
-        if (check.exists())
-        {
-            return QString(ICONPROVIDER_PIXMAPS_PATH + noExt + lookupExtensions.at(i));
-        }
-    }
-    return QString("");
-}
-
-QPixmap IconProvider::checkIconPath(const QString &path)
-{
-    // qDebug() << "Loading image: " << path;
-    QPixmap img = QPixmap(path);
-    if (img.isNull())
-           return QPixmap(ICONPROVIDER_UNKNOWN_ICON);
-    return img;
+    QIcon::setThemeSearchPaths(m_iconDirs);
 }
 
 QPixmap IconProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
@@ -91,36 +43,65 @@ QPixmap IconProvider::requestPixmap(const QString &id, QSize *size, const QSize 
     Q_UNUSED(requestedSize);
 
     // If the icon search string is empty ( it was not set ) the return unknown icon
-    if (id.isEmpty() || id == "")
-        return QPixmap(ICONPROVIDER_UNKNOWN_ICON);
+    if (id.isEmpty() || id == "") return defaultIcon();
 
-    // If the icon has a theme icon return it
-    QPixmap themeIcon = this->searchThemeIcon(id);
+    // If it is a full path ( begins with / )
+    if (id.contains(QRegExp("^/")))
+    {
+        // if it exist then load it from the path and return it
+        QString iconPath = lookupIconExtension(id);
+        if (!iconPath.isEmpty()) return QPixmap(iconPath);
+    }
+
+    // Lookup the icon
+    QPixmap themeIcon = this->searchIcon(id);
     if (!themeIcon.isNull())
         return themeIcon;
 
-    // If it is a full path ( begins with / ) then load it from the path and return it
-    if (id.contains(QRegExp("^/")))
-        return this->checkIconPath(id);
-
-    // If it is not a full path but has extension in the name
-    if (id.contains(QRegExp(ICONPROVIDER_EXTENSION_SEARCH)))
-    {
-        // Try to look it up in the /user/share/pixmaps folder
-        QString pixmapPath = this->searchPixmapPath(id);
-        if (!pixmapPath.isEmpty() && pixmapPath != "")
-        {
-            return this->checkIconPath(pixmapPath);
-        }
-    }
-
-    // Try to look it up in the /user/share/pixmaps folder
-    QString pixmapPath = this->searchPixmapPath(id);
-    if (!pixmapPath.isEmpty() && pixmapPath != "")
-        return this->checkIconPath(pixmapPath);
-
     // No icon found report it and return default unknown icon
-    qDebug() << "! No icon found: " << id;
-    return QPixmap(ICONPROVIDER_UNKNOWN_ICON);
+    // qDebug() << "No icon found for key:" << id;
+    return defaultIcon();
+}
 
+QPixmap IconProvider::defaultIcon() const
+{
+    // Return unknown icon
+    return QPixmap(searchIcon(m_settings->get("base/default_icon", ICONPROVIDER_UNKNOWN_ICON).toString()));
+}
+
+QPixmap IconProvider::searchIcon(QString search) const
+{
+    // qDebug() << "Searching theme icon: " << search;
+    // Strip extensions
+    // ( for ex.: java apps have icons specified as sun-jcontrol-jdk8.png )
+    for (const auto& ext : qAsConst(m_iconExtensions))
+        if (search.endsWith(QString(".").append(ext)))
+            search.chop(4);
+
+    // Lookup in themes
+    for (const auto &themeName : qAsConst(m_themeList))
+    {
+        QIcon::setThemeName(themeName);
+        if (QIcon::hasThemeIcon(search))
+            return QIcon::fromTheme(search).pixmap(QSize(128, 128));
+    }
+    QIcon::setThemeName(m_themeName);
+
+    // Lookup in theme paths added in constructor in order
+    for (const auto& iconDir : qAsConst(m_iconDirs))
+    {
+        QString iconPath = lookupIconExtension(QString("%1/%2").arg(iconDir, search));
+        if (!iconPath.isEmpty()) return QPixmap(iconPath);
+    }
+    return QPixmap(); // Fallback
+}
+
+QString IconProvider::lookupIconExtension(QString icon) const
+{
+    if (QFile::exists(icon)) return icon; // If the file exists with its extension return it
+    QString iconPath;
+    for(const auto& ext : qAsConst(m_iconExtensions))
+        if (QFile(iconPath = QString("%1.%2").arg(icon, ext)).exists()) // Try to lookup the file with every extensions
+            return iconPath;
+    return QString(); // No match found
 }

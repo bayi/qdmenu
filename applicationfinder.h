@@ -5,20 +5,16 @@
 #include <QtConcurrent/QtConcurrent>
 #include "application.h"
 
-#define APPLICATIONS_PATH       "/usr/share/applications"
-#define APPLICATIONS_LOCAL_PATH "/.local/share/applications"
-#define APPLICATIONS_FILES      "*.desktop"
+#define APPLICATIONS_FILES_GLOB      "*.desktop"
 
 class ApplicationFinder : public QObject
 {
     Q_OBJECT
 
-    QStringList m_files;
     QFuture<void> m_thread;
     QFutureWatcher<void> m_thread_watcher;
 
     void work();
-    QStringList readFolder(QString folder);
 
 public:
     explicit ApplicationFinder(QObject *parent = 0);

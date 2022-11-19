@@ -9,8 +9,8 @@ SOURCES += main.cpp \
     applicationfilter.cpp \
     applicationfinder.cpp \
     applicationlist.cpp \
+    desktopfileformat.cpp \
     iconprovider.cpp \
-    process.cpp \
     settings.cpp
 
 RESOURCES += qml.qrc
@@ -42,6 +42,6 @@ HEADERS += \
     applicationfilter.h \
     applicationfinder.h \
     applicationlist.h \
+    desktopfileformat.h \
     iconprovider.h \
-    process.h \
     settings.h
