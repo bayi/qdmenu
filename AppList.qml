@@ -96,7 +96,7 @@ Item
                     height: settings.getNumber("icons/width", 64)
                     width: settings.getNumber("icons/height", 64)
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.topMargin: settings.get("icons/topmargin", 8)
                 }
 
