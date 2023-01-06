@@ -25,8 +25,6 @@ Item
         {
             color: settings.get("icons/selectcolor", "#2d75af")
             radius: 8
-            width: itemWidth
-            height: itemHeight
             x: list.currentItem ? list.currentItem.x : 0
             y: list.currentItem ? list.currentItem.y : 0
             Behavior on x { SpringAnimation { spring: 3; damping: 0.2 } }
