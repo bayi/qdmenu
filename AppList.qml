@@ -109,7 +109,7 @@ Item
                     fontSizeMode: Text.Fit
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: settings.get("icons/texttopmargin", 8)
+                    anchors.bottomMargin: settings.get("icons/bottommargin", 8)
                 }
             }
         }

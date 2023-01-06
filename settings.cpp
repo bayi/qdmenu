@@ -44,7 +44,7 @@ void Settings::initDefaults()
     checkAndSet("icons/width", 64);
     checkAndSet("icons/height", 64);
     checkAndSet("icons/topmargin", 8);
-    checkAndSet("icons/texttopmargin", 8);
+    checkAndSet("icons/bottommargin", 8);
 
     checkAndSet("input/height", 32);
     checkAndSet("input/bgcolor", "#ffffff");
