@@ -16,7 +16,7 @@ void ApplicationFinder::work()
             if (!loadedFiles.contains(fileKey)) {
                 Application* app = new Application(appdirIterator.filePath());
                 if (app->parse()) {
-                    // qDebug() << "App Found: " << app->name();
+                    // qDebug() << "App Found: " << appdirIterator.filePath() << " Name: " << app->name();
                     emit appFound(app);
                     loadedFiles.append(fileKey);
                 } else delete app;
