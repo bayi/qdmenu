@@ -54,21 +54,9 @@ Item
         cellHeight: Math.floor(parent.height / heightDivider)
         cellWidth: Math.floor(parent.width / widthDivider)
 
-        add: Transition {
-            ParallelAnimation {
-                NumberAnimation { properties: "scale"; from: 0; to: 1; duration: 250; easing.type: Easing.InOutQuad }
-            }
-        }
-
-        addDisplaced: Transition {
-            ParallelAnimation {
-                NumberAnimation { properties: "scale"; to: 1; duration: 250; easing.type: Easing.InOutQuad }
-            }
-        }
-
         remove: Transition {
             ParallelAnimation {
-                NumberAnimation { properties: "scale"; from:1; to: 0; duration: 250; easing.type: Easing.InOutQuad }
+                NumberAnimation { properties: "scale"; from: 1; to: 0; duration: 250; easing.type: Easing.InOutQuad }
             }
         }
 
